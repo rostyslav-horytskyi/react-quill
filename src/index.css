@@ -40,7 +40,6 @@ body {
   color: var(--text-primary);
   line-height: 1.75;
   min-height: 300px;
-  padding: 1rem 1.25rem;
 }
 
 .ql-editor.ql-blank::before {

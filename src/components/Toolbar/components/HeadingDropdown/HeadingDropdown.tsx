@@ -8,11 +8,11 @@ interface HeadingOption {
 
 interface HeadingDropdownProps {
   onSelect: (level: number | false) => void;
+  activeHeader?: number | false;
 }
 
-function HeadingDropdown({ onSelect }: HeadingDropdownProps) {
+function HeadingDropdown({ onSelect, activeHeader }: HeadingDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState<HeadingOption | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const options: HeadingOption[] = [
@@ -24,7 +24,7 @@ function HeadingDropdown({ onSelect }: HeadingDropdownProps) {
   ];
 
   const defaultOption = options[options.length - 1];
-  const currentOption = selected || defaultOption;
+  const currentOption = options.find(opt => opt.value === activeHeader) || defaultOption;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -37,7 +37,6 @@ function HeadingDropdown({ onSelect }: HeadingDropdownProps) {
   }, []);
 
   const handleSelect = (option: HeadingOption) => {
-    setSelected(option);
     onSelect(option.value);
     setIsOpen(false);
   };

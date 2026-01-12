@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import type Quill from 'quill';
-import type { EditorFormats } from '../hooks';
+import type { EditorFormats } from '../types';
 
 interface QuillContextValue {
   quill: Quill | null;
