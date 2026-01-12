@@ -1,0 +1,108 @@
+@use 'variables' as *;
+
+// Flexbox shortcuts
+@mixin flex-center {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+// Theme-aware background
+@mixin themed-bg($light, $dark) {
+  background-color: $light;
+
+  [data-theme='dark'] & {
+      background-color: $dark;
+  }
+}
+
+// Theme-aware text
+@mixin themed-text($light, $dark) {
+  color: $light;
+
+  [data-theme='dark'] & {
+    color: $dark;
+  }
+}
+
+// Theme-aware border
+@mixin themed-border($light, $dark) {
+  border-color: $light;
+
+  [data-theme='dark'] & {
+    border-color: $dark;
+  }
+}
+
+// Button variants
+@mixin button-base {
+  align-items: center;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.875rem;
+  font-weight: 500;
+  justify-content: center;
+  padding: $spacing-sm $spacing-md;
+  transition: all $transition-fast;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+@mixin button-primary {
+  background-color: var(--color-primary);
+  color: white;
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+  }
+  @include button-base;
+}
+
+@mixin button-secondary {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+
+  &:hover:not(:disabled) {
+    background-color: var(--border-color);
+  }
+  @include button-base;
+}
+
+// Card/Panel
+@mixin card {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: $radius-lg;
+  box-shadow: 0 1px 3px rgb(0, 0, 0, 0.1);
+}
+
+// Responsive breakpoints
+@mixin mobile {
+  @media (width <= 640px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (width <= 1024px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (width >= 1025px) {
+    @content;
+  }
+}

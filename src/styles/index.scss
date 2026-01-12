@@ -1,0 +1,21 @@
+@use 'variables';
+@use 'mixins';
+
+// @use 'quill-overrides';
+// @use 'blots';
+// @use 'dark-theme';
+
+// Base styles
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  line-height: 1.5;
+  transition: background-color variables.$transition-normal, color variables.$transition-normal;
+}
