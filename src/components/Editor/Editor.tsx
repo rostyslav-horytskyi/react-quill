@@ -3,9 +3,11 @@ import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import 'quill/dist/quill.bubble.css';
 import type { EditorProps } from './types';
+import { useQuill } from '../../context';
 import './Editor.scss';
 
 const Editor = forwardRef<Quill | null, EditorProps>((props, ref) => {
+  const { setQuill } = useQuill();
   const {
     defaultValue,
     readOnly = false,
@@ -70,11 +72,15 @@ const Editor = forwardRef<Quill | null, EditorProps>((props, ref) => {
       onSelectionChangeRef.current?.(...args);
     });
 
+    // Register quill instance with context
+    setQuill(quill);
+
     // Notify that the editor is ready
     onReadyRef.current?.(quill);
 
     // Cleanup on unmount
     return () => {
+      setQuill(null);
       if (typeof ref === 'function') {
         ref(null);
       } else if (ref) {

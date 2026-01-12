@@ -1,28 +1,22 @@
-import { useRef, useState, useCallback } from 'react';
-import type Quill from 'quill';
+import { useState, useCallback } from 'react';
 import Editor from './components/Editor/Editor';
 import Toolbar from './components/Toolbar';
+import { QuillProvider, useQuill } from './context';
 import { Sun, Moon, FileText, Download, Eye, EyeOff } from 'lucide-react';
 
-function App() {
-  const quillRef = useRef<Quill | null>(null);
-  const [quillInstance, setQuillInstance] = useState<Quill | null>(null);
+function AppContent() {
+  const { quill } = useQuill();
   const [isDark, setIsDark] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
   const [wordCount, setWordCount] = useState(0);
 
-  const handleReady = useCallback((quill: Quill) => {
-    quillRef.current = quill;
-    setQuillInstance(quill);
-  }, []);
-
   const handleTextChange = useCallback(() => {
-    if (quillRef.current) {
-      const text = quillRef.current.getText();
+    if (quill) {
+      const text = quill.getText();
       const words = text.trim().split(/\s+/).filter(Boolean).length;
       setWordCount(words);
     }
-  }, []);
+  }, [quill]);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -30,8 +24,8 @@ function App() {
   };
 
   const exportContent = () => {
-    if (quillRef.current) {
-      const content = JSON.stringify(quillRef.current.getContents(), null, 2);
+    if (quill) {
+      const content = JSON.stringify(quill.getContents(), null, 2);
       const blob = new Blob([content], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -113,15 +107,13 @@ function App() {
           className={`rounded-2xl shadow-xl overflow-hidden transition-all duration-300 ${isDark ? 'bg-gray-800 shadow-gray-900/50' : 'bg-white shadow-gray-200/50'}`}
         >
           {/* Toolbar */}
-          {!isPreview && <Toolbar quill={quillInstance} />}
+          {!isPreview && <Toolbar />}
 
           {/* Editor */}
           <div className={`transition-colors ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
             <Editor
-              ref={quillRef}
               placeholder="Start writing something amazing..."
               onTextChange={handleTextChange}
-              onReady={handleReady}
               readOnly={isPreview}
               className={isPreview ? 'opacity-90' : ''}
             />
@@ -144,6 +136,14 @@ function App() {
         </p>
       </footer>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <QuillProvider>
+      <AppContent />
+    </QuillProvider>
   );
 }
 
