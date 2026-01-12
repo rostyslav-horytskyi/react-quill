@@ -1,10 +1,25 @@
 # Technical Specification: Advanced Rich Text Engine (Quill Customization)
 
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Phase 0: Project Setup](#phase-0-project-setup)
+3. [Phase 1: Core Editor](#phase-1-core-editor)
+4. [Phase 2: Dark Theme](#phase-2-dark-theme)
+5. [Phase 3: Simple Blots](#phase-3-simple-blots)
+6. [Phase 4: Medium Complexity Blots](#phase-4-medium-complexity-blots)
+7. [Phase 5: Complex Blots](#phase-5-complex-blots)
+8. [Phase 6: AI Assistant](#phase-6-ai-assistant)
+9. [Implementation Checklist](#implementation-checklist)
+10. [References](#references)
+
+---
+
 ## Overview
 
 ### Project Purpose
 
-This is a **portfolio demonstration project** showcasing advanced Quill editor customization capabilities. The project demonstrates:
+This is a **portfolio demonstration project** showcasing advanced Quill editor customization capabilities:
 
 - **Deep DOM manipulation** - Custom rendering and DOM structure management
 - **Library extension** - Extending Quill with custom Blots and modules
@@ -13,147 +28,138 @@ This is a **portfolio demonstration project** showcasing advanced Quill editor c
 
 ### What We're Building
 
-A rich text editor with **10 custom Blots** that go beyond standard text formatting:
+A rich text editor with **10 custom Blots** organized by complexity:
 
-| # | Blot | Description | Complexity |
-|---|------|-------------|------------|
-| 1 | Product Card | Embedded product with image, price, CTA button | High |
-| 2 | Mention | @user references with autocomplete dropdown | Medium |
-| 3 | Interactive Checklist | Toggleable checkboxes with persistent state | Medium |
-| 4 | Alert/Callout | Info, warning, error, success message blocks | Low |
-| 5 | Code Block (Enhanced) | Syntax highlighting with language selector | Medium |
-| 6 | Embed (Video/Social) | YouTube, Twitter, custom embed support | Medium |
-| 7 | Table (Enhanced) | Resizable columns, basic cell operations | High |
-| 8 | Collapsible/Accordion | Expandable content sections | Medium |
-| 9 | Divider | Styled horizontal rules with variants | Low |
-| 10 | AI Assistant | "Ask Copilot" inline text editing | High |
+| #   | Blot                  | Complexity | Phase |
+| --- | --------------------- | ---------- | ----- |
+| 1   | Divider               | Low        | 3     |
+| 2   | Alert/Callout         | Low        | 3     |
+| 3   | Mention               | Medium     | 4     |
+| 4   | Interactive Checklist | Medium     | 4     |
+| 5   | Collapsible/Accordion | Medium     | 4     |
+| 6   | Code Block (Enhanced) | Medium     | 4     |
+| 7   | Embed (Video/Social)  | Medium     | 4     |
+| 8   | Product Card          | High       | 5     |
+| 9   | Table (Enhanced)      | High       | 5     |
+| 10  | AI Assistant          | High       | 6     |
 
 ### Tech Stack
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| React | 19.x | UI framework |
-| Vite | 7.x | Build tool |
-| TypeScript | 5.x | Type safety |
-| Quill | 2.x | Rich text engine |
-| Tailwind CSS | 4.x | Utility-first styling |
-| SCSS | 1.x | Custom component styles |
-| ESLint | 9.x | Code linting |
-| Prettier | 3.x | Code formatting |
-| GitHub Actions | - | CI/CD pipeline |
+| Technology     | Version | Purpose          |
+| -------------- | ------- | ---------------- |
+| React          | 19.x    | UI framework     |
+| Vite           | 7.x     | Build tool       |
+| TypeScript     | 5.x     | Type safety      |
+| Quill          | 2.x     | Rich text engine |
+| SCSS           | 1.x     | Component styles |
+| ESLint         | 9.x     | Code linting     |
+| Stylelint      | 16.x    | Style linting    |
+| Prettier       | 3.x     | Code formatting  |
+| Husky          | 9.x     | Git hooks        |
+| GitHub Actions | -       | CI/CD pipeline   |
 
-### Core Concepts
-
-This implementation is based on the [official Quill React playground](https://quilljs.com/playground/react) patterns and best practices.
-
-## Architecture
-
-### Design Pattern: Uncontrolled Component with ForwardRef
-
-The implementation follows an **uncontrolled component pattern** using `forwardRef`. This approach:
-- Gives direct access to the Quill instance via ref
-- Avoids React state synchronization issues with the editor's internal state
-- Provides optimal performance by not re-rendering on every keystroke
-- Aligns with Quill's imperative API design
+### Project Structure
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                        App                              │
-│  ┌───────────────────────────────────────────────────┐  │
-│  │                    Editor                         │  │
-│  │  ┌─────────────┐    ┌─────────────────────────┐   │  │
-│  │  │  Toolbar    │    │     Editor Container    │   │  │
-│  │  │  (optional) │    │   ┌─────────────────┐   │   │  │
-│  │  └─────────────┘    │   │  Quill Instance │   │   │  │
-│  │                     │   └─────────────────┘   │   │  │
-│  │                     └─────────────────────────┘   │  │
-│  └───────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────┘
-```
-
-## Component Structure
-
-### File Organization
-
-```
-src/
-├── components/
-│   ├── Editor/
-│   │   ├── index.ts              # Public exports
-│   │   ├── Editor.tsx            # Main editor component
-│   │   ├── Editor.scss           # Editor-specific styles
-│   │   └── types.ts              # TypeScript interfaces
-│   ├── ThemeProvider/
-│   │   ├── index.ts              # Theme context exports
-│   │   ├── ThemeProvider.tsx     # Dark/light theme provider
-│   │   └── useTheme.ts           # Theme hook
-│   └── ui/                       # Shared UI components
-│       ├── Button.tsx
-│       ├── Dropdown.tsx
-│       └── Modal.tsx
-├── blots/                        # Custom Quill Blots
-│   ├── index.ts                  # Register all blots
-│   ├── ProductCardBlot.ts        # Product card embed
-│   ├── MentionBlot.ts            # @mention inline
-│   ├── ChecklistBlot.ts          # Interactive checklist
-│   ├── AlertBlot.ts              # Alert/callout blocks
-│   ├── CodeBlockBlot.ts          # Enhanced code block
-│   ├── EmbedBlot.ts              # Video/social embeds
-│   ├── TableBlot.ts              # Enhanced table
-│   ├── CollapsibleBlot.ts        # Accordion sections
-│   ├── DividerBlot.ts            # Styled dividers
-│   └── AIAssistantBlot.ts        # Ask Copilot feature
-├── modules/                      # Custom Quill Modules
-│   ├── index.ts                  # Register all modules
-│   ├── MentionModule.ts          # Autocomplete for mentions
-│   ├── AIAssistantModule.ts      # AI text editing module
-│   └── ToolbarModule.ts          # Custom toolbar handlers
-├── styles/                       # Global styles
-│   ├── index.scss                # Main SCSS entry point
-│   ├── _variables.scss           # SCSS variables & CSS custom properties
-│   ├── _mixins.scss              # Reusable SCSS mixins
-│   ├── _quill-overrides.scss     # Quill theme customizations
-│   ├── _blots.scss               # Custom blot styles
-│   └── _dark-theme.scss          # Dark mode styles
-├── hooks/
-│   ├── useQuill.ts               # Quill instance hook
-│   ├── useAutoSave.ts            # Auto-save functionality
-│   ├── useTheme.ts               # Theme toggle hook
-│   └── useMentions.ts            # Mention suggestions hook
-├── utils/
-│   ├── delta.ts                  # Delta helper utilities
-│   ├── blotUtils.ts              # Blot creation helpers
-│   └── aiService.ts              # AI API integration (mock/real)
-├── types/
-│   ├── blots.ts                  # Blot data interfaces
-│   ├── editor.ts                 # Editor types
-│   └── ai.ts                     # AI service types
-├── App.tsx
-├── main.tsx
-└── index.css                     # Tailwind directives (imports SCSS)
-
-# Root config files
-├── .eslintrc.cjs                 # ESLint configuration
-├── .prettierrc                   # Prettier configuration
-├── .prettierignore               # Prettier ignore patterns
-├── tailwind.config.js            # Tailwind configuration
-├── postcss.config.js             # PostCSS configuration
-├── vite.config.ts                # Vite configuration
-└── .github/
-    └── workflows/
-        └── ci.yml                # GitHub Actions CI/CD
+react-quill/
+├── src/
+│   ├── components/
+│   │   ├── Editor/
+│   │   │   ├── index.ts
+│   │   │   ├── Editor.tsx
+│   │   │   ├── Editor.scss
+│   │   │   └── types.ts
+│   │   ├── ThemeProvider/
+│   │   │   ├── index.ts
+│   │   │   ├── ThemeProvider.tsx
+│   │   │   └── useTheme.ts
+│   │   └── ui/
+│   │       ├── Button.tsx
+│   │       ├── ThemeToggle.tsx
+│   │       └── Dropdown.tsx
+│   ├── blots/
+│   │   ├── index.ts
+│   │   ├── DividerBlot.ts
+│   │   ├── AlertBlot.ts
+│   │   ├── MentionBlot.ts
+│   │   ├── ChecklistBlot.ts
+│   │   ├── CollapsibleBlot.ts
+│   │   ├── CodeBlockBlot.ts
+│   │   ├── EmbedBlot.ts
+│   │   ├── ProductCardBlot.ts
+│   │   ├── TableBlot.ts
+│   │   └── AIAssistantBlot.ts
+│   ├── modules/
+│   │   ├── index.ts
+│   │   ├── AIAssistantModule.ts
+│   │   └── MentionModule.ts
+│   ├── styles/
+│   │   ├── index.scss
+│   │   ├── _variables.scss
+│   │   ├── _mixins.scss
+│   │   ├── _quill-overrides.scss
+│   │   ├── _blots.scss
+│   │   └── _dark-theme.scss
+│   ├── hooks/
+│   │   ├── useQuill.ts
+│   │   └── useAutoSave.ts
+│   ├── utils/
+│   │   ├── delta.ts
+│   │   └── aiService.ts
+│   ├── types/
+│   │   ├── blots.ts
+│   │   └── editor.ts
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── .husky/
+│   └── pre-commit
+├── eslint.config.js
+├── .prettierrc
+├── .prettierignore
+├── .stylelintrc.json
+├── vite.config.ts
+├── tsconfig.json
+└── package.json
 ```
 
 ---
 
-## Development Setup
+## Phase 0: Project Setup
 
-### ESLint Configuration
+This phase establishes all development tooling before writing any application code.
+
+### 0.1 Initialize Project
 
 ```bash
-# Install ESLint with TypeScript and React plugins
-npm install -D eslint @eslint/js typescript-eslint eslint-plugin-react-hooks eslint-plugin-react-refresh
+# Create Vite project with React + TypeScript
+npm create vite@latest react-quill -- --template react-swc-ts
+cd react-quill
+npm install
 ```
+
+### 0.2 Install Dependencies
+
+```bash
+# Core dependencies
+npm install quill
+
+# Dev dependencies - Linting & Formatting
+npm install -D eslint @eslint/js typescript-eslint eslint-plugin-react-hooks eslint-plugin-react-refresh globals
+npm install -D prettier eslint-config-prettier eslint-plugin-prettier
+npm install -D stylelint stylelint-config-standard-scss stylelint-config-prettier-scss stylelint-order stylelint-prettier
+
+# Dev dependencies - Git hooks
+npm install -D husky lint-staged
+
+# Dev dependencies - Styling
+npm install -D sass
+```
+
+### 0.3 ESLint Configuration
 
 ```javascript
 // eslint.config.js
@@ -189,14 +195,7 @@ export default tseslint.config(
 );
 ```
 
----
-
-### Prettier Configuration
-
-```bash
-# Install Prettier
-npm install -D prettier eslint-config-prettier eslint-plugin-prettier
-```
+### 0.4 Prettier Configuration
 
 ```json
 // .prettierrc
@@ -209,8 +208,7 @@ npm install -D prettier eslint-config-prettier eslint-plugin-prettier
   "bracketSpacing": true,
   "arrowParens": "avoid",
   "endOfLine": "lf",
-  "jsxSingleQuote": false,
-  "plugins": []
+  "jsxSingleQuote": false
 }
 ```
 
@@ -225,21 +223,80 @@ coverage
 package-lock.json
 ```
 
----
+### 0.5 Stylelint Configuration
 
-### SCSS Setup
-
-```bash
-# Install SCSS support for Vite
-npm install -D sass
+```json
+// .stylelintrc.json
+{
+  "extends": ["stylelint-config-standard-scss", "stylelint-config-prettier-scss"],
+  "plugins": ["stylelint-order", "stylelint-prettier"],
+  "rules": {
+    "order/properties-alphabetical-order": true,
+    "prettier/prettier": true,
+    "scss/at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": ["tailwind", "apply", "layer", "config"]
+      }
+    ],
+    "selector-class-pattern": null
+  }
+}
 ```
 
-#### SCSS Variables & Theme
+### 0.6 Husky & lint-staged Setup
+
+```bash
+# Initialize Husky
+npx husky init
+```
+
+```bash
+# .husky/pre-commit
+npx lint-staged
+```
+
+Add to `package.json`:
+
+```json
+{
+  "lint-staged": {
+    "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+    "*.{scss,css}": ["stylelint --fix", "prettier --write"],
+    "*.{json,md}": ["prettier --write"]
+  }
+}
+```
+
+### 0.7 Package.json Scripts
+
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:styles": "stylelint \"src/**/*.{css,scss}\"",
+    "lint:styles:fix": "stylelint \"src/**/*.{css,scss}\" --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,scss,css,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,scss,css,json}\"",
+    "type-check": "tsc --noEmit",
+    "validate": "npm run type-check && npm run lint && npm run lint:styles && npm run format:check",
+    "prepare": "husky"
+  }
+}
+```
+
+### 0.8 SCSS Setup
+
+#### Variables
 
 ```scss
 // src/styles/_variables.scss
 
-// Colors - Light Theme
+// Colors
 $color-primary: #3b82f6;
 $color-primary-hover: #2563eb;
 $color-secondary: #6b7280;
@@ -248,21 +305,21 @@ $color-warning: #f59e0b;
 $color-error: #ef4444;
 $color-info: #3b82f6;
 
-// Light theme colors
-$light-bg: #ffffff;
+// Light theme
+$light-bg: #fff;
 $light-bg-secondary: #f9fafb;
 $light-text: #111827;
 $light-text-secondary: #6b7280;
 $light-border: #e5e7eb;
 
-// Dark theme colors
+// Dark theme
 $dark-bg: #1f2937;
 $dark-bg-secondary: #111827;
 $dark-text: #f9fafb;
 $dark-text-secondary: #9ca3af;
 $dark-border: #374151;
 
-// CSS Custom Properties for runtime theming
+// CSS Custom Properties
 :root {
   --color-primary: #{$color-primary};
   --color-primary-hover: #{$color-primary-hover};
@@ -271,7 +328,6 @@ $dark-border: #374151;
   --color-error: #{$color-error};
   --color-info: #{$color-info};
 
-  // Light theme (default)
   --bg-primary: #{$light-bg};
   --bg-secondary: #{$light-bg-secondary};
   --text-primary: #{$light-text};
@@ -279,7 +335,6 @@ $dark-border: #374151;
   --border-color: #{$light-border};
 }
 
-// Dark theme
 [data-theme='dark'] {
   --bg-primary: #{$dark-bg};
   --bg-secondary: #{$dark-bg-secondary};
@@ -299,80 +354,51 @@ $spacing-xl: 2rem;
 $radius-sm: 0.25rem;
 $radius-md: 0.375rem;
 $radius-lg: 0.5rem;
-$radius-xl: 0.75rem;
 
 // Transitions
 $transition-fast: 150ms ease;
 $transition-normal: 200ms ease;
-$transition-slow: 300ms ease;
 
-// Z-index layers
+// Z-index
 $z-dropdown: 100;
 $z-modal: 200;
 $z-tooltip: 300;
-$z-ai-toolbar: 400;
 ```
 
-#### SCSS Mixins
+#### Mixins
 
 ```scss
 // src/styles/_mixins.scss
 
 @use 'variables' as *;
 
-// Flexbox shortcuts
 @mixin flex-center {
-  display: flex;
   align-items: center;
+  display: flex;
   justify-content: center;
 }
 
 @mixin flex-between {
-  display: flex;
   align-items: center;
+  display: flex;
   justify-content: space-between;
 }
 
-// Theme-aware background
-@mixin themed-bg($light, $dark) {
-  background-color: $light;
-  [data-theme='dark'] & {
-    background-color: $dark;
-  }
-}
-
-// Theme-aware text
-@mixin themed-text($light, $dark) {
-  color: $light;
-  [data-theme='dark'] & {
-    color: $dark;
-  }
-}
-
-// Theme-aware border
-@mixin themed-border($light, $dark) {
-  border-color: $light;
-  [data-theme='dark'] & {
-    border-color: $dark;
-  }
-}
-
-// Button variants
 @mixin button-base {
-  display: inline-flex;
   align-items: center;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.875rem;
+  font-weight: 500;
   justify-content: center;
   padding: $spacing-sm $spacing-md;
-  border-radius: $radius-md;
-  font-weight: 500;
-  font-size: 0.875rem;
   transition: all $transition-fast;
-  cursor: pointer;
-  border: none;
 
   &:disabled {
-    opacity: 0.5;
     cursor: not-allowed;
+    opacity: 0.5;
   }
 }
 
@@ -386,57 +412,22 @@ $z-ai-toolbar: 400;
   }
 }
 
-@mixin button-secondary {
-  @include button-base;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-
-  &:hover:not(:disabled) {
-    background-color: var(--border-color);
-  }
-}
-
-// Card/Panel
 @mixin card {
   background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: $radius-lg;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-// Responsive breakpoints
-@mixin mobile {
-  @media (max-width: 640px) {
-    @content;
-  }
-}
-
-@mixin tablet {
-  @media (max-width: 1024px) {
-    @content;
-  }
-}
-
-@mixin desktop {
-  @media (min-width: 1025px) {
-    @content;
-  }
+  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
 }
 ```
 
-#### Main SCSS Entry Point
+#### Main Entry Point
 
 ```scss
 // src/styles/index.scss
 
 @use 'variables';
 @use 'mixins';
-@use 'quill-overrides';
-@use 'blots';
-@use 'dark-theme';
 
-// Base styles
 * {
   box-sizing: border-box;
   margin: 0;
@@ -444,15 +435,17 @@ $z-ai-toolbar: 400;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   background-color: var(--bg-secondary);
   color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
-  transition: background-color variables.$transition-normal, color variables.$transition-normal;
+  transition:
+    background-color variables.$transition-normal,
+    color variables.$transition-normal;
 }
 ```
 
-#### Vite SCSS Configuration
+### 0.9 Vite Configuration
 
 ```typescript
 // vite.config.ts
@@ -481,31 +474,7 @@ export default defineConfig({
 });
 ```
 
----
-
-### Package.json Scripts
-
-```json
-{
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext .ts,.tsx --report-unused-disable-directives --max-warnings 0",
-    "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "format": "prettier --write \"src/**/*.{ts,tsx,scss,css,json}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,scss,css,json}\"",
-    "type-check": "tsc --noEmit",
-    "validate": "npm run type-check && npm run lint && npm run format:check"
-  }
-}
-```
-
----
-
-## GitHub Actions CI/CD
-
-### CI Workflow
+### 0.10 GitHub Actions CI
 
 ```yaml
 # .github/workflows/ci.yml
@@ -514,9 +483,9 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [master]
   pull_request:
-    branches: [main, develop]
+    branches: [master]
 
 jobs:
   validate:
@@ -539,449 +508,50 @@ jobs:
       - name: Type check
         run: npm run type-check
 
-      - name: Lint
+      - name: Lint (ESLint)
         run: npm run lint
 
-      - name: Format check
+      - name: Lint styles (Stylelint)
+        run: npm run lint:styles
+
+      - name: Format check (Prettier)
         run: npm run format:check
 
       - name: Build
         run: npm run build
-
-  test:
-    name: Run Tests
-    runs-on: ubuntu-latest
-    needs: validate
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: npm test --if-present
-
-  deploy-preview:
-    name: Deploy Preview
-    runs-on: ubuntu-latest
-    needs: [validate, test]
-    if: github.event_name == 'pull_request'
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      # Add Vercel/Netlify preview deployment here
-      # - name: Deploy to Vercel Preview
-      #   uses: amondnet/vercel-action@v25
-      #   with:
-      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
-      #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-      #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-
-  deploy-production:
-    name: Deploy Production
-    runs-on: ubuntu-latest
-    needs: [validate, test]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      # Add production deployment here
-      # - name: Deploy to Vercel Production
-      #   uses: amondnet/vercel-action@v25
-      #   with:
-      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
-      #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-      #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-      #     vercel-args: '--prod'
-```
-
-### GitHub CLI Commands
-
-```bash
-# Check workflow runs
-gh run list
-
-# View specific run
-gh run view <run-id>
-
-# Watch a run in real-time
-gh run watch
-
-# Re-run failed jobs
-gh run rerun <run-id> --failed
-
-# View workflow logs
-gh run view <run-id> --log
-
-# Create PR with checks
-gh pr create --title "Feature: Add custom blot" --body "Description" --draft
-
-# Check PR status
-gh pr checks
 ```
 
 ---
 
-## Dark Theme Implementation
+## Phase 1: Core Editor
 
-### Theme Context
+This phase implements the basic Quill editor integration with React.
 
-```typescript
-// src/components/ThemeProvider/ThemeProvider.tsx
+### 1.1 Architecture: Uncontrolled Component with ForwardRef
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+The implementation follows an **uncontrolled component pattern**:
 
-type Theme = 'light' | 'dark' | 'system';
+- Direct access to Quill instance via ref
+- No React state synchronization issues
+- Optimal performance (no re-renders on keystroke)
+- Aligns with Quill's imperative API
 
-interface ThemeContextType {
-  theme: Theme;
-  resolvedTheme: 'light' | 'dark';
-  setTheme: (theme: Theme) => void;
-  toggleTheme: () => void;
-}
-
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-const STORAGE_KEY = 'quill-editor-theme';
-
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === 'undefined') return 'system';
-    return (localStorage.getItem(STORAGE_KEY) as Theme) || 'system';
-  });
-
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
-
-  useEffect(() => {
-    const root = document.documentElement;
-
-    const applyTheme = (isDark: boolean) => {
-      root.setAttribute('data-theme', isDark ? 'dark' : 'light');
-      root.classList.toggle('dark', isDark);
-      setResolvedTheme(isDark ? 'dark' : 'light');
-    };
-
-    if (theme === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      applyTheme(mediaQuery.matches);
-
-      const handler = (e: MediaQueryListEvent) => applyTheme(e.matches);
-      mediaQuery.addEventListener('change', handler);
-      return () => mediaQuery.removeEventListener('change', handler);
-    } else {
-      applyTheme(theme === 'dark');
-    }
-  }, [theme]);
-
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-    localStorage.setItem(STORAGE_KEY, newTheme);
-  };
-
-  const toggleTheme = () => {
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
-  };
-
-  return (
-    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-}
-
-export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
-}
+```
+┌─────────────────────────────────────────────────────────┐
+│                        App                              │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │                    Editor                         │  │
+│  │  ┌─────────────┐    ┌─────────────────────────┐   │  │
+│  │  │  Toolbar    │    │     Editor Container    │   │  │
+│  │  │  (optional) │    │   ┌─────────────────┐   │   │  │
+│  │  └─────────────┘    │   │  Quill Instance │   │   │  │
+│  │                     │   └─────────────────┘   │   │  │
+│  │                     └─────────────────────────┘   │  │
+│  └───────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### Theme Toggle Component
-
-```typescript
-// src/components/ui/ThemeToggle.tsx
-
-import { useTheme } from '../ThemeProvider';
-
-export function ThemeToggle() {
-  const { resolvedTheme, toggleTheme } = useTheme();
-
-  return (
-    <button
-      onClick={toggleTheme}
-      className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-      aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} theme`}
-    >
-      {resolvedTheme === 'dark' ? (
-        <span className="text-xl">☀️</span>
-      ) : (
-        <span className="text-xl">🌙</span>
-      )}
-    </button>
-  );
-}
-```
-
-### Quill Dark Theme Styles
-
-```scss
-// src/styles/_dark-theme.scss
-
-@use 'variables' as *;
-
-// Dark theme Quill overrides
-[data-theme='dark'] {
-  // Snow theme
-  .ql-snow {
-    .ql-toolbar {
-      background-color: $dark-bg-secondary;
-      border-color: $dark-border;
-
-      button {
-        color: $dark-text-secondary;
-
-        &:hover {
-          color: $dark-text;
-        }
-
-        &.ql-active {
-          color: $color-primary;
-        }
-      }
-
-      .ql-stroke {
-        stroke: $dark-text-secondary;
-      }
-
-      .ql-fill {
-        fill: $dark-text-secondary;
-      }
-
-      button:hover .ql-stroke,
-      button.ql-active .ql-stroke {
-        stroke: $color-primary;
-      }
-
-      button:hover .ql-fill,
-      button.ql-active .ql-fill {
-        fill: $color-primary;
-      }
-
-      .ql-picker {
-        color: $dark-text-secondary;
-
-        &-label {
-          color: $dark-text-secondary;
-
-          &:hover {
-            color: $dark-text;
-          }
-        }
-
-        &-options {
-          background-color: $dark-bg;
-          border-color: $dark-border;
-        }
-
-        &-item {
-          color: $dark-text-secondary;
-
-          &:hover {
-            color: $dark-text;
-            background-color: $dark-bg-secondary;
-          }
-        }
-      }
-    }
-
-    .ql-container {
-      background-color: $dark-bg;
-      border-color: $dark-border;
-      color: $dark-text;
-    }
-
-    .ql-editor {
-      color: $dark-text;
-
-      &.ql-blank::before {
-        color: $dark-text-secondary;
-      }
-
-      // Code blocks in dark mode
-      pre.ql-syntax {
-        background-color: lighten($dark-bg-secondary, 5%);
-        border: 1px solid $dark-border;
-      }
-
-      // Blockquote in dark mode
-      blockquote {
-        border-left-color: $dark-border;
-        color: $dark-text-secondary;
-      }
-
-      // Links in dark mode
-      a {
-        color: lighten($color-primary, 10%);
-      }
-    }
-  }
-
-  // Bubble theme
-  .ql-bubble {
-    .ql-tooltip {
-      background-color: $dark-bg-secondary;
-      border-color: $dark-border;
-      color: $dark-text;
-
-      &-arrow {
-        border-bottom-color: $dark-bg-secondary;
-      }
-    }
-  }
-
-  // Custom blots dark mode
-  .ql-product-card {
-    background-color: $dark-bg-secondary;
-    border-color: $dark-border;
-  }
-
-  .ql-alert {
-    &.alert-info {
-      background-color: rgba($color-info, 0.15);
-    }
-    &.alert-warning {
-      background-color: rgba($color-warning, 0.15);
-    }
-    &.alert-error {
-      background-color: rgba($color-error, 0.15);
-    }
-    &.alert-success {
-      background-color: rgba($color-success, 0.15);
-    }
-  }
-
-  .ql-code-block-enhanced {
-    pre {
-      background-color: lighten($dark-bg-secondary, 3%);
-    }
-  }
-
-  .ql-collapsible {
-    background-color: $dark-bg-secondary;
-    border-color: $dark-border;
-  }
-
-  .ql-enhanced-table {
-    th {
-      background-color: $dark-bg-secondary;
-    }
-    td,
-    th {
-      border-color: $dark-border;
-    }
-  }
-
-  // AI toolbar dark mode
-  .ai-toolbar {
-    background-color: $dark-bg;
-    border-color: $dark-border;
-
-    .ai-btn:hover {
-      background-color: $dark-bg-secondary;
-    }
-  }
-}
-```
-
-### Using Theme in App
-
-```tsx
-// src/main.tsx
-
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { ThemeProvider } from './components/ThemeProvider';
-import App from './App';
-import './styles/index.scss';
-import './index.css'; // Tailwind
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
-  </React.StrictMode>
-);
-```
-
-```tsx
-// src/App.tsx (updated header)
-
-import { ThemeToggle } from './components/ui/ThemeToggle';
-
-function App() {
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-      <header className="bg-white dark:bg-gray-800 shadow-sm transition-colors">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-            React Quill Editor
-          </h1>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            {/* Other controls */}
-          </div>
-        </div>
-      </header>
-      {/* ... */}
-    </div>
-  );
-}
-```
-
----
-
-## Core Implementation
-
-### Editor Component Interface
+### 1.2 TypeScript Interfaces
 
 ```typescript
 // src/components/Editor/types.ts
@@ -994,11 +564,11 @@ export interface EditorProps {
   defaultValue?: Delta;
   /** Read-only mode */
   readOnly?: boolean;
-  /** Placeholder text when empty */
+  /** Placeholder text */
   placeholder?: string;
   /** Theme: 'snow' | 'bubble' */
   theme?: 'snow' | 'bubble';
-  /** Additional Tailwind classes */
+  /** Additional CSS classes */
   className?: string;
   /** Callback when text changes */
   onTextChange?: (delta: Delta, oldDelta: Delta, source: string) => void;
@@ -1014,7 +584,7 @@ export interface Range {
 }
 ```
 
-### Editor Component Implementation
+### 1.3 Editor Component
 
 ```typescript
 // src/components/Editor/Editor.tsx
@@ -1024,6 +594,7 @@ import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import 'quill/dist/quill.bubble.css';
 import type { EditorProps } from './types';
+import './Editor.scss';
 
 const Editor = forwardRef<Quill | null, EditorProps>(
   (
@@ -1052,12 +623,12 @@ const Editor = forwardRef<Quill | null, EditorProps>(
       onReadyRef.current = onReady;
     });
 
-    // Initialize Quill instance
+    // Initialize Quill
     useEffect(() => {
       const container = containerRef.current;
       if (!container) return;
 
-      // Create editor container element
+      // Create editor container
       const editorContainer = container.appendChild(
         container.ownerDocument.createElement('div')
       );
@@ -1073,7 +644,6 @@ const Editor = forwardRef<Quill | null, EditorProps>(
             ['bold', 'italic', 'underline', 'strike'],
             [{ color: [] }, { background: [] }],
             [{ list: 'ordered' }, { list: 'bullet' }],
-            [{ indent: '-1' }, { indent: '+1' }],
             ['blockquote', 'code-block'],
             ['link', 'image'],
             ['clean'],
@@ -1126,7 +696,7 @@ const Editor = forwardRef<Quill | null, EditorProps>(
     return (
       <div
         ref={containerRef}
-        className={`flex flex-col h-96 ${className}`}
+        className={`editor-container ${className}`}
       />
     );
   }
@@ -1137,11 +707,47 @@ Editor.displayName = 'Editor';
 export default Editor;
 ```
 
-## Key Implementation Details
+### 1.4 Editor Styles
 
-### 1. Ref Pattern for Callbacks
+```scss
+// src/components/Editor/Editor.scss
 
-Use `useRef` to store callbacks to prevent stale closures:
+@use '@/styles/variables' as *;
+
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+
+  .ql-toolbar {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    border-radius: $radius-lg $radius-lg 0 0;
+  }
+
+  .ql-container {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+    border-radius: 0 0 $radius-lg $radius-lg;
+    flex: 1;
+    font-size: 1rem;
+    overflow: auto;
+  }
+
+  .ql-editor {
+    min-height: 100%;
+
+    &.ql-blank::before {
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+  }
+}
+```
+
+### 1.5 Key Implementation Details
+
+**1. Ref Pattern for Callbacks**
 
 ```typescript
 const onTextChangeRef = useRef(onTextChange);
@@ -1153,267 +759,417 @@ useLayoutEffect(() => {
 
 **Why**: React's `useEffect` captures variables at creation time. Without refs, event handlers would reference stale callback versions.
 
-### 2. Dynamic Container Creation
-
-Create the editor container dynamically within the effect:
+**2. Dynamic Container Creation**
 
 ```typescript
-const editorContainer = container.appendChild(
-  container.ownerDocument.createElement('div')
-);
+const editorContainer = container.appendChild(container.ownerDocument.createElement('div'));
 ```
 
 **Why**: Quill modifies DOM directly. Creating the container in the effect ensures proper cleanup and prevents React reconciliation conflicts.
 
-### 3. Cleanup on Unmount
+**3. Cleanup on Unmount**
 
 ```typescript
 return () => {
-  if (typeof ref === 'function') {
-    ref(null);
-  } else if (ref) {
-    ref.current = null;
-  }
+  ref.current = null;
   container.innerHTML = '';
 };
 ```
 
 **Why**: Prevents memory leaks and ensures clean state if component remounts.
 
-### 4. ReadOnly State Management
+### 1.6 Working with Delta
 
-Handle `readOnly` changes in a separate effect:
-
-```typescript
-useEffect(() => {
-  ref.current?.enable(!readOnly);
-}, [ref, readOnly]);
-```
-
-**Why**: Allows toggling read-only state without reinitializing the editor.
-
-## Toolbar Configuration
-
-### Default Toolbar (Snow Theme)
+Delta is Quill's format for representing content:
 
 ```typescript
-const toolbarOptions = [
-  [{ header: [1, 2, 3, false] }],
-  ['bold', 'italic', 'underline', 'strike'],
-  [{ color: [] }, { background: [] }],
-  [{ list: 'ordered' }, { list: 'bullet' }],
-  [{ indent: '-1' }, { indent: '+1' }],
-  [{ align: [] }],
-  ['blockquote', 'code-block'],
-  ['link', 'image', 'video'],
-  ['clean'],
-];
+import { Delta } from 'quill/core';
+
+// Creating content
+const content = new Delta()
+  .insert('Hello ', { bold: true })
+  .insert('World')
+  .insert('\n', { header: 1 });
+
+// Get content
+const delta = quill.getContents();
+
+// Set content
+quill.setContents(delta);
+
+// Get plain text
+const text = quill.getText();
+
+// Apply changes
+const change = new Delta().retain(5).delete(3).insert('new text');
+quill.updateContents(change);
 ```
 
-### Minimal Toolbar
+---
+
+## Phase 2: Dark Theme
+
+This phase implements dark/light theme switching.
+
+### 2.1 Theme Context
 
 ```typescript
-const minimalToolbar = [
-  ['bold', 'italic', 'underline'],
-  ['link'],
-];
-```
+// src/components/ThemeProvider/ThemeProvider.tsx
 
-### Custom Toolbar (HTML-based)
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-```tsx
-// In parent component
-<div id="toolbar">
-  <button className="ql-bold" />
-  <button className="ql-italic" />
-  <select className="ql-size">
-    <option value="small" />
-    <option selected />
-    <option value="large" />
-    <option value="huge" />
-  </select>
-</div>
+type Theme = 'light' | 'dark' | 'system';
 
-// Editor config
-modules: {
-  toolbar: '#toolbar'
+interface ThemeContextType {
+  theme: Theme;
+  resolvedTheme: 'light' | 'dark';
+  setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
+}
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+const STORAGE_KEY = 'quill-editor-theme';
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window === 'undefined') return 'system';
+    return (localStorage.getItem(STORAGE_KEY) as Theme) || 'system';
+  });
+
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const applyTheme = (isDark: boolean) => {
+      root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      setResolvedTheme(isDark ? 'dark' : 'light');
+    };
+
+    if (theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      applyTheme(mediaQuery.matches);
+
+      const handler = (e: MediaQueryListEvent) => applyTheme(e.matches);
+      mediaQuery.addEventListener('change', handler);
+      return () => mediaQuery.removeEventListener('change', handler);
+    } else {
+      applyTheme(theme === 'dark');
+    }
+  }, [theme]);
+
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme);
+    localStorage.setItem(STORAGE_KEY, newTheme);
+  };
+
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
 }
 ```
 
-## Custom Blots Architecture
+### 2.2 Theme Toggle Component
 
-### Understanding Quill Blots
+```typescript
+// src/components/ui/ThemeToggle.tsx
 
-Blots are the building blocks of Quill's document model. Every piece of content in Quill is represented by a Blot.
+import { useTheme } from '../ThemeProvider';
+import './ThemeToggle.scss';
+
+export function ThemeToggle() {
+  const { resolvedTheme, toggleTheme } = useTheme();
+
+  return (
+    <button
+      onClick={toggleTheme}
+      className="theme-toggle"
+      aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} theme`}
+    >
+      {resolvedTheme === 'dark' ? '☀️' : '🌙'}
+    </button>
+  );
+}
+```
+
+### 2.3 Dark Theme Styles
+
+```scss
+// src/styles/_dark-theme.scss
+
+@use 'variables' as *;
+
+[data-theme='dark'] {
+  // Snow theme toolbar
+  .ql-snow .ql-toolbar {
+    background-color: $dark-bg-secondary;
+    border-color: $dark-border;
+
+    button {
+      color: $dark-text-secondary;
+
+      &:hover {
+        color: $dark-text;
+      }
+
+      &.ql-active {
+        color: $color-primary;
+      }
+    }
+
+    .ql-stroke {
+      stroke: $dark-text-secondary;
+    }
+
+    .ql-fill {
+      fill: $dark-text-secondary;
+    }
+
+    button:hover .ql-stroke,
+    button.ql-active .ql-stroke {
+      stroke: $color-primary;
+    }
+
+    .ql-picker {
+      color: $dark-text-secondary;
+
+      &-options {
+        background-color: $dark-bg;
+        border-color: $dark-border;
+      }
+
+      &-item:hover {
+        color: $dark-text;
+        background-color: $dark-bg-secondary;
+      }
+    }
+  }
+
+  // Snow theme container
+  .ql-snow .ql-container {
+    background-color: $dark-bg;
+    border-color: $dark-border;
+    color: $dark-text;
+  }
+
+  .ql-snow .ql-editor {
+    color: $dark-text;
+
+    &.ql-blank::before {
+      color: $dark-text-secondary;
+    }
+
+    pre.ql-syntax {
+      background-color: lighten($dark-bg-secondary, 5%);
+      border: 1px solid $dark-border;
+    }
+
+    blockquote {
+      border-left-color: $dark-border;
+      color: $dark-text-secondary;
+    }
+
+    a {
+      color: lighten($color-primary, 10%);
+    }
+  }
+}
+```
+
+### 2.4 Using Theme in App
+
+```tsx
+// src/main.tsx
+
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { ThemeProvider } from './components/ThemeProvider';
+import App from './App';
+import './styles/index.scss';
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
+  </React.StrictMode>
+);
+```
+
+---
+
+## Phase 3: Simple Blots
+
+This phase implements low-complexity blots to understand the Blot API.
+
+### 3.0 Understanding Quill Blots
+
+Blots are the building blocks of Quill's document model:
 
 ```
 Quill Document Model
-├── Block Blots (block-level elements)
-│   ├── Paragraph, Header, List, Blockquote
-│   └── Custom: Alert, Checklist, Collapsible, Table
-├── Inline Blots (inline elements)
+├── Block Blots (block-level)
+│   ├── Paragraph, Header, List
+│   └── Custom: Alert, Collapsible
+├── Inline Blots (inline)
 │   ├── Bold, Italic, Link
-│   └── Custom: Mention, AI Assistant
-└── Embed Blots (void/atomic elements)
+│   └── Custom: Mention
+└── Embed Blots (void/atomic)
     ├── Image, Video
-    └── Custom: Product Card, Divider, Social Embed
+    └── Custom: Divider, Product Card
 ```
 
-### Blot Types
+| Type       | Base Class             | Content                     |
+| ---------- | ---------------------- | --------------------------- |
+| **Block**  | `Block` / `BlockEmbed` | Contains other blots        |
+| **Inline** | `Inline`               | Wraps text                  |
+| **Embed**  | `Embed`                | Self-contained, no children |
 
-| Type | Base Class | Use Case | Content |
-|------|------------|----------|---------|
-| **Block** | `BlockEmbed` | Full-width elements | Contains other blots |
-| **Inline** | `Inline` | Text-level formatting | Wraps text |
-| **Embed** | `Embed` | Atomic/void elements | Self-contained, no children |
-
-### Base Blot Implementation Pattern
-
-```typescript
-// src/blots/base/CustomBlot.ts
-
-import Quill from 'quill';
-
-const BlockEmbed = Quill.import('blots/block/embed');
-
-interface BlotData {
-  id: string;
-  // ... custom properties
-}
-
-class CustomBlot extends BlockEmbed {
-  static blotName = 'custom-blot';
-  static tagName = 'div';
-  static className = 'ql-custom-blot';
-
-  // Create DOM from data
-  static create(data: BlotData): HTMLElement {
-    const node = super.create() as HTMLElement;
-    node.setAttribute('data-id', data.id);
-    // Build DOM structure
-    return node;
-  }
-
-  // Extract data from DOM (for Delta)
-  static value(node: HTMLElement): BlotData {
-    return {
-      id: node.getAttribute('data-id') || '',
-    };
-  }
-
-  // Format method for updates
-  static formats(node: HTMLElement): BlotData {
-    return CustomBlot.value(node);
-  }
-}
-
-export default CustomBlot;
-```
-
-### Registering Blots
+### 3.1 Blot Registration
 
 ```typescript
 // src/blots/index.ts
 
 import Quill from 'quill';
-
-// Import all custom blots
-import ProductCardBlot from './ProductCardBlot';
-import MentionBlot from './MentionBlot';
-import ChecklistBlot from './ChecklistBlot';
-import AlertBlot from './AlertBlot';
-import CodeBlockBlot from './CodeBlockBlot';
-import EmbedBlot from './EmbedBlot';
-import TableBlot from './TableBlot';
-import CollapsibleBlot from './CollapsibleBlot';
 import DividerBlot from './DividerBlot';
-import AIAssistantBlot from './AIAssistantBlot';
+import AlertBlot from './AlertBlot';
 
-// Register all blots
 export function registerBlots() {
-  Quill.register(ProductCardBlot);
-  Quill.register(MentionBlot);
-  Quill.register(ChecklistBlot);
-  Quill.register(AlertBlot);
-  Quill.register(CodeBlockBlot, true); // Override default
-  Quill.register(EmbedBlot);
-  Quill.register(TableBlot, true); // Override default
-  Quill.register(CollapsibleBlot);
   Quill.register(DividerBlot);
-  Quill.register(AIAssistantBlot);
+  Quill.register(AlertBlot);
 }
 
-// Export individual blots for direct use
-export {
-  ProductCardBlot,
-  MentionBlot,
-  ChecklistBlot,
-  AlertBlot,
-  CodeBlockBlot,
-  EmbedBlot,
-  TableBlot,
-  CollapsibleBlot,
-  DividerBlot,
-  AIAssistantBlot,
-};
+export { DividerBlot, AlertBlot };
 ```
 
----
+### 3.2 Divider Blot (Complexity: Low)
 
-## Custom Blots Implementation
-
-### 1. Product Card Blot
-
-Embeddable product card with image, title, price, and CTA button.
+Styled horizontal dividers with variants.
 
 ```typescript
-// src/blots/ProductCardBlot.ts
+// src/blots/DividerBlot.ts
 
 import Quill from 'quill';
 
 const BlockEmbed = Quill.import('blots/block/embed');
 
-export interface ProductCardData {
-  id: string;
-  title: string;
-  price: number;
-  currency: string;
-  imageUrl: string;
-  productUrl: string;
-  description?: string;
+export type DividerStyle = 'solid' | 'dashed' | 'dotted' | 'gradient' | 'stars';
+
+export interface DividerData {
+  style: DividerStyle;
 }
 
-class ProductCardBlot extends BlockEmbed {
-  static blotName = 'product-card';
+class DividerBlot extends BlockEmbed {
+  static blotName = 'divider';
   static tagName = 'div';
-  static className = 'ql-product-card';
+  static className = 'ql-divider';
 
-  static create(data: ProductCardData): HTMLElement {
+  static create(data: DividerData): HTMLElement {
     const node = super.create() as HTMLElement;
 
-    node.setAttribute('data-id', data.id);
+    node.setAttribute('data-style', data.style);
     node.setAttribute('contenteditable', 'false');
 
+    let dividerHtml = '';
+
+    switch (data.style) {
+      case 'solid':
+        dividerHtml = '<hr class="divider-solid" />';
+        break;
+      case 'dashed':
+        dividerHtml = '<hr class="divider-dashed" />';
+        break;
+      case 'dotted':
+        dividerHtml = '<hr class="divider-dotted" />';
+        break;
+      case 'gradient':
+        dividerHtml = '<div class="divider-gradient"></div>';
+        break;
+      case 'stars':
+        dividerHtml = '<div class="divider-stars">***</div>';
+        break;
+    }
+
+    node.innerHTML = `<div class="divider-wrapper">${dividerHtml}</div>`;
+    return node;
+  }
+
+  static value(node: HTMLElement): DividerData {
+    return {
+      style: (node.getAttribute('data-style') as DividerStyle) || 'solid',
+    };
+  }
+}
+
+export default DividerBlot;
+```
+
+**Delta Format:**
+
+```typescript
+new Delta().insert({ divider: { style: 'gradient' } });
+```
+
+### 3.3 Alert/Callout Blot (Complexity: Low)
+
+Info, warning, error, success message blocks.
+
+```typescript
+// src/blots/AlertBlot.ts
+
+import Quill from 'quill';
+
+const BlockEmbed = Quill.import('blots/block/embed');
+
+export type AlertType = 'info' | 'warning' | 'error' | 'success';
+
+export interface AlertData {
+  type: AlertType;
+  title?: string;
+  message: string;
+}
+
+const ALERT_CONFIG: Record<AlertType, { icon: string; class: string }> = {
+  info: { icon: 'ℹ️', class: 'alert-info' },
+  warning: { icon: '⚠️', class: 'alert-warning' },
+  error: { icon: '❌', class: 'alert-error' },
+  success: { icon: '✅', class: 'alert-success' },
+};
+
+class AlertBlot extends BlockEmbed {
+  static blotName = 'alert';
+  static tagName = 'div';
+  static className = 'ql-alert';
+
+  static create(data: AlertData): HTMLElement {
+    const node = super.create() as HTMLElement;
+    const config = ALERT_CONFIG[data.type];
+
+    node.setAttribute('data-type', data.type);
+    node.setAttribute('contenteditable', 'false');
+    node.classList.add(config.class);
+
     node.innerHTML = `
-      <div class="flex border rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
-        <img
-          src="${data.imageUrl}"
-          alt="${data.title}"
-          class="w-32 h-32 object-cover"
-        />
-        <div class="flex-1 p-4">
-          <h4 class="font-semibold text-gray-900 dark:text-white">${data.title}</h4>
-          ${data.description ? `<p class="text-sm text-gray-600 dark:text-gray-300 mt-1">${data.description}</p>` : ''}
-          <div class="flex items-center justify-between mt-3">
-            <span class="text-lg font-bold text-blue-600">${data.currency}${data.price}</span>
-            <a
-              href="${data.productUrl}"
-              target="_blank"
-              class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
-            >
-              View Product
-            </a>
-          </div>
+      <div class="alert-content">
+        <span class="alert-icon">${config.icon}</span>
+        <div class="alert-body">
+          ${data.title ? `<h5 class="alert-title">${data.title}</h5>` : ''}
+          <p class="alert-message">${data.message}</p>
         </div>
       </div>
     `;
@@ -1421,46 +1177,128 @@ class ProductCardBlot extends BlockEmbed {
     return node;
   }
 
-  static value(node: HTMLElement): ProductCardData {
-    const img = node.querySelector('img');
-    const title = node.querySelector('h4');
-    const price = node.querySelector('.text-blue-600');
-    const link = node.querySelector('a');
-    const desc = node.querySelector('p');
-
+  static value(node: HTMLElement): AlertData {
     return {
-      id: node.getAttribute('data-id') || '',
-      title: title?.textContent || '',
-      price: parseFloat(price?.textContent?.replace(/[^0-9.]/g, '') || '0'),
-      currency: price?.textContent?.replace(/[0-9.]/g, '') || '$',
-      imageUrl: img?.src || '',
-      productUrl: link?.href || '',
-      description: desc?.textContent || undefined,
+      type: (node.getAttribute('data-type') as AlertType) || 'info',
+      title: node.querySelector('.alert-title')?.textContent || undefined,
+      message: node.querySelector('.alert-message')?.textContent || '',
     };
   }
 }
 
-export default ProductCardBlot;
+export default AlertBlot;
 ```
 
 **Delta Format:**
+
 ```typescript
-const delta = new Delta().insert({
-  'product-card': {
-    id: 'prod-123',
-    title: 'Wireless Headphones',
-    price: 99.99,
-    currency: '$',
-    imageUrl: '/images/headphones.jpg',
-    productUrl: '/products/headphones',
-    description: 'Premium sound quality'
-  }
+new Delta().insert({
+  alert: {
+    type: 'warning',
+    title: 'Important',
+    message: 'Please save your work.',
+  },
 });
+```
+
+### 3.4 Blot Styles
+
+```scss
+// src/styles/_blots.scss
+
+@use 'variables' as *;
+
+// Divider styles
+.ql-divider {
+  margin: $spacing-lg 0;
+
+  .divider-wrapper {
+    padding: $spacing-sm 0;
+  }
+
+  .divider-solid {
+    border: none;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .divider-dashed {
+    border: none;
+    border-top: 1px dashed var(--border-color);
+  }
+
+  .divider-dotted {
+    border: none;
+    border-top: 2px dotted var(--border-color);
+  }
+
+  .divider-gradient {
+    background: linear-gradient(to right, transparent, var(--border-color), transparent);
+    border-radius: 2px;
+    height: 2px;
+  }
+
+  .divider-stars {
+    color: var(--text-secondary);
+    letter-spacing: 1em;
+    text-align: center;
+  }
+}
+
+// Alert styles
+.ql-alert {
+  border-left: 4px solid;
+  border-radius: 0 $radius-md $radius-md 0;
+  margin: $spacing-md 0;
+  padding: $spacing-md;
+
+  &.alert-info {
+    background-color: rgba($color-info, 0.1);
+    border-left-color: $color-info;
+  }
+
+  &.alert-warning {
+    background-color: rgba($color-warning, 0.1);
+    border-left-color: $color-warning;
+  }
+
+  &.alert-error {
+    background-color: rgba($color-error, 0.1);
+    border-left-color: $color-error;
+  }
+
+  &.alert-success {
+    background-color: rgba($color-success, 0.1);
+    border-left-color: $color-success;
+  }
+
+  .alert-content {
+    align-items: flex-start;
+    display: flex;
+    gap: $spacing-sm;
+  }
+
+  .alert-icon {
+    font-size: 1.25rem;
+  }
+
+  .alert-title {
+    font-weight: 600;
+    margin-bottom: $spacing-xs;
+  }
+
+  .alert-message {
+    font-size: 0.875rem;
+  }
+}
 ```
 
 ---
 
-### 2. Mention Blot
+## Phase 4: Medium Complexity Blots
+
+This phase implements blots with more complex behavior.
+
+### 4.1 Mention Blot
 
 Inline @mention with user reference.
 
@@ -1490,9 +1328,9 @@ class MentionBlot extends Embed {
     node.setAttribute('contenteditable', 'false');
 
     node.innerHTML = `
-      <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
-        ${data.avatar ? `<img src="${data.avatar}" class="w-4 h-4 rounded-full" />` : ''}
-        @${data.name}
+      <span class="mention-badge">
+        ${data.avatar ? `<img src="${data.avatar}" class="mention-avatar" alt="" />` : ''}
+        <span class="mention-name">@${data.name}</span>
       </span>
     `;
 
@@ -1503,7 +1341,7 @@ class MentionBlot extends Embed {
     return {
       id: node.getAttribute('data-id') || '',
       name: node.getAttribute('data-name') || '',
-      avatar: node.querySelector('img')?.src,
+      avatar: node.querySelector('.mention-avatar')?.getAttribute('src') || undefined,
     };
   }
 }
@@ -1512,18 +1350,17 @@ export default MentionBlot;
 ```
 
 **Delta Format:**
+
 ```typescript
-const delta = new Delta()
+new Delta()
   .insert('Hey ')
-  .insert({ mention: { id: 'user-1', name: 'john_doe', avatar: '/avatars/john.jpg' } })
+  .insert({ mention: { id: 'user-1', name: 'john_doe' } })
   .insert(' check this out!');
 ```
 
----
+### 4.2 Interactive Checklist Blot
 
-### 3. Interactive Checklist Blot
-
-Checklist items with toggleable state.
+Toggleable checkboxes with persistent state.
 
 ```typescript
 // src/blots/ChecklistBlot.ts
@@ -1549,20 +1386,19 @@ class ChecklistBlot extends Block {
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.checked = data.checked;
-    checkbox.className = 'mr-2 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500';
+    checkbox.className = 'checklist-checkbox';
 
-    checkbox.addEventListener('change', (e) => {
+    checkbox.addEventListener('change', e => {
       const target = e.target as HTMLInputElement;
       node.setAttribute('data-checked', String(target.checked));
-      node.classList.toggle('line-through', target.checked);
-      node.classList.toggle('text-gray-400', target.checked);
+      node.classList.toggle('is-checked', target.checked);
     });
 
     node.insertBefore(checkbox, node.firstChild);
-    node.classList.add('flex', 'items-start', 'py-1');
+    node.classList.add('checklist-item');
 
     if (data.checked) {
-      node.classList.add('line-through', 'text-gray-400');
+      node.classList.add('is-checked');
     }
 
     return node;
@@ -1579,128 +1415,99 @@ export default ChecklistBlot;
 ```
 
 **Delta Format:**
+
 ```typescript
-const delta = new Delta()
+new Delta()
   .insert('Buy groceries', { checklist: { checked: false } })
   .insert('\n')
   .insert('Call mom', { checklist: { checked: true } })
   .insert('\n');
 ```
 
----
+### 4.3 Collapsible/Accordion Blot
 
-### 4. Alert/Callout Blot
-
-Styled message blocks for different alert types.
+Expandable content sections.
 
 ```typescript
-// src/blots/AlertBlot.ts
+// src/blots/CollapsibleBlot.ts
 
 import Quill from 'quill';
 
 const BlockEmbed = Quill.import('blots/block/embed');
 
-export type AlertType = 'info' | 'warning' | 'error' | 'success';
-
-export interface AlertData {
-  type: AlertType;
-  title?: string;
-  message: string;
+export interface CollapsibleData {
+  title: string;
+  content: string;
+  expanded: boolean;
 }
 
-const ALERT_STYLES: Record<AlertType, { bg: string; border: string; icon: string }> = {
-  info: {
-    bg: 'bg-blue-50 dark:bg-blue-900/20',
-    border: 'border-blue-500',
-    icon: 'ℹ️',
-  },
-  warning: {
-    bg: 'bg-yellow-50 dark:bg-yellow-900/20',
-    border: 'border-yellow-500',
-    icon: '⚠️',
-  },
-  error: {
-    bg: 'bg-red-50 dark:bg-red-900/20',
-    border: 'border-red-500',
-    icon: '❌',
-  },
-  success: {
-    bg: 'bg-green-50 dark:bg-green-900/20',
-    border: 'border-green-500',
-    icon: '✅',
-  },
-};
-
-class AlertBlot extends BlockEmbed {
-  static blotName = 'alert';
+class CollapsibleBlot extends BlockEmbed {
+  static blotName = 'collapsible';
   static tagName = 'div';
-  static className = 'ql-alert';
+  static className = 'ql-collapsible';
 
-  static create(data: AlertData): HTMLElement {
+  static create(data: CollapsibleData): HTMLElement {
     const node = super.create() as HTMLElement;
-    const styles = ALERT_STYLES[data.type];
 
-    node.setAttribute('data-type', data.type);
-    node.setAttribute('contenteditable', 'false');
-
-    node.className = `ql-alert ${styles.bg} ${styles.border} border-l-4 p-4 my-2 rounded-r-lg`;
+    node.setAttribute('data-expanded', String(data.expanded));
 
     node.innerHTML = `
-      <div class="flex items-start gap-3">
-        <span class="text-xl">${styles.icon}</span>
-        <div>
-          ${data.title ? `<h5 class="font-semibold mb-1">${data.title}</h5>` : ''}
-          <p class="text-sm">${data.message}</p>
+      <div class="collapsible-container">
+        <button class="collapsible-header" type="button">
+          <span class="collapsible-title">${data.title}</span>
+          <span class="collapsible-chevron ${data.expanded ? 'is-expanded' : ''}">▼</span>
+        </button>
+        <div class="collapsible-content ${data.expanded ? '' : 'is-hidden'}">
+          ${data.content}
         </div>
       </div>
     `;
 
+    const button = node.querySelector('.collapsible-header');
+    const content = node.querySelector('.collapsible-content');
+    const chevron = node.querySelector('.collapsible-chevron');
+
+    button?.addEventListener('click', () => {
+      const isExpanded = node.getAttribute('data-expanded') === 'true';
+      node.setAttribute('data-expanded', String(!isExpanded));
+      content?.classList.toggle('is-hidden');
+      chevron?.classList.toggle('is-expanded');
+    });
+
     return node;
   }
 
-  static value(node: HTMLElement): AlertData {
-    const type = node.getAttribute('data-type') as AlertType || 'info';
-    const title = node.querySelector('h5')?.textContent || undefined;
-    const message = node.querySelector('p')?.textContent || '';
-
-    return { type, title, message };
+  static value(node: HTMLElement): CollapsibleData {
+    return {
+      title: node.querySelector('.collapsible-title')?.textContent || '',
+      content: node.querySelector('.collapsible-content')?.innerHTML || '',
+      expanded: node.getAttribute('data-expanded') === 'true',
+    };
   }
 }
 
-export default AlertBlot;
+export default CollapsibleBlot;
 ```
 
-**Delta Format:**
-```typescript
-const delta = new Delta().insert({
-  alert: {
-    type: 'warning',
-    title: 'Important Notice',
-    message: 'Please save your work before proceeding.'
-  }
-});
-```
+### 4.4 Enhanced Code Block Blot
 
----
-
-### 5. Enhanced Code Block Blot
-
-Code block with syntax highlighting and language selector.
+Syntax highlighting with language selector.
 
 ```typescript
 // src/blots/CodeBlockBlot.ts
 
 import Quill from 'quill';
-import hljs from 'highlight.js';
 
-const Block = Quill.import('blots/block');
+const BlockEmbed = Quill.import('blots/block/embed');
 
 export interface CodeBlockData {
   language: string;
   code: string;
 }
 
-class CodeBlockBlot extends Block {
+const LANGUAGES = ['javascript', 'typescript', 'python', 'html', 'css', 'json'];
+
+class CodeBlockBlot extends BlockEmbed {
   static blotName = 'code-block-enhanced';
   static tagName = 'div';
   static className = 'ql-code-block-enhanced';
@@ -1711,33 +1518,28 @@ class CodeBlockBlot extends Block {
     node.setAttribute('data-language', data.language);
     node.setAttribute('contenteditable', 'false');
 
-    const highlighted = hljs.highlight(data.code, {
-      language: data.language,
-      ignoreIllegals: true
-    }).value;
+    const options = LANGUAGES.map(
+      lang => `<option value="${lang}" ${lang === data.language ? 'selected' : ''}>${lang}</option>`
+    ).join('');
 
     node.innerHTML = `
-      <div class="relative rounded-lg overflow-hidden bg-gray-900 my-2">
-        <div class="flex items-center justify-between px-4 py-2 bg-gray-800 text-gray-400 text-xs">
-          <select class="bg-transparent border-none text-gray-400 text-xs focus:outline-none">
-            <option value="javascript" ${data.language === 'javascript' ? 'selected' : ''}>JavaScript</option>
-            <option value="typescript" ${data.language === 'typescript' ? 'selected' : ''}>TypeScript</option>
-            <option value="python" ${data.language === 'python' ? 'selected' : ''}>Python</option>
-            <option value="html" ${data.language === 'html' ? 'selected' : ''}>HTML</option>
-            <option value="css" ${data.language === 'css' ? 'selected' : ''}>CSS</option>
-          </select>
-          <button class="copy-btn hover:text-white transition-colors">Copy</button>
+      <div class="code-block-container">
+        <div class="code-block-header">
+          <select class="code-block-language">${options}</select>
+          <button class="code-block-copy" type="button">Copy</button>
         </div>
-        <pre class="p-4 overflow-x-auto"><code class="hljs language-${data.language}">${highlighted}</code></pre>
+        <pre class="code-block-pre"><code class="language-${data.language}">${escapeHtml(data.code)}</code></pre>
       </div>
     `;
 
-    // Add copy functionality
-    const copyBtn = node.querySelector('.copy-btn');
+    // Copy button handler
+    const copyBtn = node.querySelector('.code-block-copy');
     copyBtn?.addEventListener('click', () => {
       navigator.clipboard.writeText(data.code);
-      if (copyBtn) copyBtn.textContent = 'Copied!';
-      setTimeout(() => { if (copyBtn) copyBtn.textContent = 'Copy'; }, 2000);
+      if (copyBtn) {
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => (copyBtn.textContent = 'Copy'), 2000);
+      }
     });
 
     return node;
@@ -1751,24 +1553,16 @@ class CodeBlockBlot extends Block {
   }
 }
 
+function escapeHtml(text: string): string {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 export default CodeBlockBlot;
 ```
 
-**Delta Format:**
-```typescript
-const delta = new Delta().insert({
-  'code-block-enhanced': {
-    language: 'typescript',
-    code: `function greet(name: string): string {
-  return \`Hello, \${name}!\`;
-}`
-  }
-});
-```
-
----
-
-### 6. Embed Blot (Video/Social)
+### 4.5 Embed Blot (Video/Social)
 
 Support for YouTube, Twitter, and custom embeds.
 
@@ -1803,12 +1597,11 @@ class EmbedBlot extends BlockEmbed {
 
     switch (data.type) {
       case 'youtube':
-        const videoId = EmbedBlot.extractYouTubeId(data.url);
+        const videoId = extractYouTubeId(data.url);
         embedHtml = `
-          <div class="relative pb-[56.25%] h-0 overflow-hidden rounded-lg">
+          <div class="embed-youtube">
             <iframe
               src="https://www.youtube.com/embed/${videoId}"
-              class="absolute top-0 left-0 w-full h-full"
               frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen
@@ -1818,214 +1611,132 @@ class EmbedBlot extends BlockEmbed {
         break;
       case 'twitter':
         embedHtml = `
-          <div class="twitter-embed p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
-            <a href="${data.url}" target="_blank" class="text-blue-500 hover:underline">
-              View Tweet
-            </a>
+          <div class="embed-twitter">
+            <a href="${data.url}" target="_blank">View Tweet</a>
           </div>
         `;
         break;
       default:
         embedHtml = `
-          <iframe
-            src="${data.url}"
-            class="w-full h-64 rounded-lg border"
-            frameborder="0"
-          ></iframe>
+          <iframe src="${data.url}" class="embed-iframe" frameborder="0"></iframe>
         `;
     }
 
-    node.innerHTML = `<div class="my-2">${embedHtml}</div>`;
+    node.innerHTML = `<div class="embed-wrapper">${embedHtml}</div>`;
     return node;
-  }
-
-  static extractYouTubeId(url: string): string {
-    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
-    return match?.[1] || '';
   }
 
   static value(node: HTMLElement): EmbedData {
     return {
-      type: node.getAttribute('data-type') as EmbedType || 'iframe',
+      type: (node.getAttribute('data-type') as EmbedType) || 'iframe',
       url: node.getAttribute('data-url') || '',
     };
   }
 }
 
-export default EmbedBlot;
-```
+function extractYouTubeId(url: string): string {
+  const match = url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/
+  );
+  return match?.[1] || '';
+}
 
-**Delta Format:**
-```typescript
-const delta = new Delta().insert({
-  'custom-embed': {
-    type: 'youtube',
-    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    title: 'My Video'
-  }
-});
+export default EmbedBlot;
 ```
 
 ---
 
-### 7. Collapsible/Accordion Blot
+## Phase 5: Complex Blots
 
-Expandable content sections.
+This phase implements high-complexity blots with rich interactions.
+
+### 5.1 Product Card Blot
+
+Embedded product with image, price, and CTA button.
 
 ```typescript
-// src/blots/CollapsibleBlot.ts
+// src/blots/ProductCardBlot.ts
 
 import Quill from 'quill';
 
 const BlockEmbed = Quill.import('blots/block/embed');
 
-export interface CollapsibleData {
+export interface ProductCardData {
+  id: string;
   title: string;
-  content: string;
-  expanded: boolean;
+  price: number;
+  currency: string;
+  imageUrl: string;
+  productUrl: string;
+  description?: string;
 }
 
-class CollapsibleBlot extends BlockEmbed {
-  static blotName = 'collapsible';
+class ProductCardBlot extends BlockEmbed {
+  static blotName = 'product-card';
   static tagName = 'div';
-  static className = 'ql-collapsible';
+  static className = 'ql-product-card';
 
-  static create(data: CollapsibleData): HTMLElement {
+  static create(data: ProductCardData): HTMLElement {
     const node = super.create() as HTMLElement;
 
-    node.setAttribute('data-expanded', String(data.expanded));
+    node.setAttribute('data-id', data.id);
+    node.setAttribute('contenteditable', 'false');
 
     node.innerHTML = `
-      <div class="border rounded-lg overflow-hidden my-2">
-        <button
-          class="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          type="button"
-        >
-          <span class="font-medium">${data.title}</span>
-          <span class="chevron transform transition-transform ${data.expanded ? 'rotate-180' : ''}">▼</span>
-        </button>
-        <div class="content ${data.expanded ? '' : 'hidden'} p-4 border-t">
-          ${data.content}
+      <div class="product-card-container">
+        <img
+          src="${data.imageUrl}"
+          alt="${data.title}"
+          class="product-card-image"
+        />
+        <div class="product-card-body">
+          <h4 class="product-card-title">${data.title}</h4>
+          ${data.description ? `<p class="product-card-description">${data.description}</p>` : ''}
+          <div class="product-card-footer">
+            <span class="product-card-price">${data.currency}${data.price.toFixed(2)}</span>
+            <a href="${data.productUrl}" target="_blank" class="product-card-cta">
+              View Product
+            </a>
+          </div>
         </div>
       </div>
     `;
 
-    const button = node.querySelector('button');
-    const content = node.querySelector('.content');
-    const chevron = node.querySelector('.chevron');
-
-    button?.addEventListener('click', () => {
-      const isExpanded = node.getAttribute('data-expanded') === 'true';
-      node.setAttribute('data-expanded', String(!isExpanded));
-      content?.classList.toggle('hidden');
-      chevron?.classList.toggle('rotate-180');
-    });
-
     return node;
   }
 
-  static value(node: HTMLElement): CollapsibleData {
+  static value(node: HTMLElement): ProductCardData {
+    const img = node.querySelector('.product-card-image') as HTMLImageElement;
+    const title = node.querySelector('.product-card-title');
+    const price = node.querySelector('.product-card-price');
+    const link = node.querySelector('.product-card-cta') as HTMLAnchorElement;
+    const desc = node.querySelector('.product-card-description');
+
+    const priceText = price?.textContent || '$0';
+    const currency = priceText.replace(/[\d.]/g, '');
+    const priceValue = parseFloat(priceText.replace(/[^\d.]/g, ''));
+
     return {
-      title: node.querySelector('button span')?.textContent || '',
-      content: node.querySelector('.content')?.innerHTML || '',
-      expanded: node.getAttribute('data-expanded') === 'true',
+      id: node.getAttribute('data-id') || '',
+      title: title?.textContent || '',
+      price: priceValue,
+      currency: currency || '$',
+      imageUrl: img?.src || '',
+      productUrl: link?.href || '',
+      description: desc?.textContent || undefined,
     };
   }
 }
 
-export default CollapsibleBlot;
+export default ProductCardBlot;
 ```
 
-**Delta Format:**
-```typescript
-const delta = new Delta().insert({
-  collapsible: {
-    title: 'Click to expand',
-    content: '<p>Hidden content here...</p>',
-    expanded: false
-  }
-});
-```
+### 5.2 Enhanced Table Blot
 
----
-
-### 8. Divider Blot
-
-Styled horizontal dividers.
+Table with headers support.
 
 ```typescript
-// src/blots/DividerBlot.ts
-
-import Quill from 'quill';
-
-const BlockEmbed = Quill.import('blots/block/embed');
-
-export type DividerStyle = 'solid' | 'dashed' | 'dotted' | 'gradient' | 'stars';
-
-export interface DividerData {
-  style: DividerStyle;
-}
-
-class DividerBlot extends BlockEmbed {
-  static blotName = 'divider';
-  static tagName = 'div';
-  static className = 'ql-divider';
-
-  static create(data: DividerData): HTMLElement {
-    const node = super.create() as HTMLElement;
-
-    node.setAttribute('data-style', data.style);
-    node.setAttribute('contenteditable', 'false');
-
-    let dividerHtml = '';
-
-    switch (data.style) {
-      case 'solid':
-        dividerHtml = '<hr class="border-gray-300 dark:border-gray-600" />';
-        break;
-      case 'dashed':
-        dividerHtml = '<hr class="border-dashed border-gray-300 dark:border-gray-600" />';
-        break;
-      case 'dotted':
-        dividerHtml = '<hr class="border-dotted border-gray-300 dark:border-gray-600" />';
-        break;
-      case 'gradient':
-        dividerHtml = '<div class="h-1 bg-gradient-to-r from-transparent via-gray-400 to-transparent rounded-full"></div>';
-        break;
-      case 'stars':
-        dividerHtml = '<div class="text-center text-gray-400 tracking-[1em]">***</div>';
-        break;
-    }
-
-    node.innerHTML = `<div class="my-6">${dividerHtml}</div>`;
-    return node;
-  }
-
-  static value(node: HTMLElement): DividerData {
-    return {
-      style: node.getAttribute('data-style') as DividerStyle || 'solid',
-    };
-  }
-}
-
-export default DividerBlot;
-```
-
-**Delta Format:**
-```typescript
-const delta = new Delta().insert({
-  divider: { style: 'gradient' }
-});
-```
-
----
-
-### 9. Table (Enhanced) Blot
-
-> **Note:** Full table implementation is complex. This shows the structure; actual implementation would require additional modules for cell selection, resizing, etc.
-
-```typescript
-// src/blots/TableBlot.ts (Simplified)
+// src/blots/TableBlot.ts
 
 import Quill from 'quill';
 
@@ -2043,18 +1754,20 @@ class TableBlot extends BlockEmbed {
 
   static create(data: TableData): HTMLElement {
     const node = super.create() as HTMLElement;
+    node.setAttribute('contenteditable', 'false');
 
-    const headerRow = data.headers && data.rows.length > 0
-      ? `<thead><tr>${data.rows[0].map(cell => `<th class="border px-4 py-2 bg-gray-100 dark:bg-gray-700 font-semibold">${cell}</th>`).join('')}</tr></thead>`
-      : '';
+    const headerRow =
+      data.headers && data.rows.length > 0
+        ? `<thead><tr>${data.rows[0].map(cell => `<th>${cell}</th>`).join('')}</tr></thead>`
+        : '';
 
     const bodyRows = (data.headers ? data.rows.slice(1) : data.rows)
-      .map(row => `<tr>${row.map(cell => `<td class="border px-4 py-2">${cell}</td>`).join('')}</tr>`)
+      .map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`)
       .join('');
 
     node.innerHTML = `
-      <div class="overflow-x-auto my-4">
-        <table class="w-full border-collapse border border-gray-300 dark:border-gray-600">
+      <div class="table-wrapper">
+        <table class="enhanced-table">
           ${headerRow}
           <tbody>${bodyRows}</tbody>
         </table>
@@ -2082,24 +1795,27 @@ export default TableBlot;
 ```
 
 **Delta Format:**
+
 ```typescript
-const delta = new Delta().insert({
+new Delta().insert({
   'enhanced-table': {
     headers: true,
     rows: [
       ['Name', 'Price', 'Stock'],
       ['Widget A', '$10', '50'],
       ['Widget B', '$20', '30'],
-    ]
-  }
+    ],
+  },
 });
 ```
 
 ---
 
-### 10. AI Assistant Blot (Ask Copilot)
+## Phase 6: AI Assistant
 
-Inline AI-powered text editing with selection-based transformations.
+This phase implements the "Ask Copilot" feature for AI-powered text editing.
+
+### 6.1 AI Assistant Blot
 
 ```typescript
 // src/blots/AIAssistantBlot.ts
@@ -2129,17 +1845,17 @@ class AIAssistantBlot extends Embed {
 
     if (data.status === 'loading') {
       node.innerHTML = `
-        <span class="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 rounded-lg">
-          <span class="animate-spin">⚙️</span>
+        <span class="ai-loading">
+          <span class="ai-spinner">⚙️</span>
           <span>AI is thinking...</span>
         </span>
       `;
     } else if (data.status === 'complete' && data.suggestion) {
       node.innerHTML = `
-        <span class="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 rounded-lg border-2 border-dashed border-green-300">
-          <span>${data.suggestion}</span>
-          <button class="accept-btn ml-2 text-green-600 hover:text-green-800" title="Accept">✓</button>
-          <button class="reject-btn text-red-600 hover:text-red-800" title="Reject">✗</button>
+        <span class="ai-suggestion">
+          <span class="ai-text">${data.suggestion}</span>
+          <button class="ai-accept" title="Accept">✓</button>
+          <button class="ai-reject" title="Reject">✗</button>
         </span>
       `;
     }
@@ -2150,7 +1866,7 @@ class AIAssistantBlot extends Embed {
   static value(node: HTMLElement): AIAssistantData {
     return {
       id: node.getAttribute('data-id') || '',
-      status: node.getAttribute('data-status') as AIAssistantData['status'] || 'idle',
+      status: (node.getAttribute('data-status') as AIAssistantData['status']) || 'idle',
       originalText: '',
     };
   }
@@ -2159,11 +1875,53 @@ class AIAssistantBlot extends Embed {
 export default AIAssistantBlot;
 ```
 
----
+### 6.2 AI Service
 
-## AI Assistant Module (Ask Copilot)
+```typescript
+// src/utils/aiService.ts
 
-### Module Implementation
+export type AIPromptType = 'improve' | 'simplify' | 'expand' | 'fix-grammar' | 'custom';
+
+interface GenerateTextOptions {
+  text: string;
+  action: AIPromptType;
+  customPrompt?: string;
+  useMock?: boolean;
+}
+
+// Mock responses for demo
+const MOCK_RESPONSES: Record<AIPromptType, (text: string) => string> = {
+  improve: text => `${text} [improved with better clarity]`,
+  simplify: text =>
+    text
+      .split(' ')
+      .slice(0, Math.ceil(text.split(' ').length / 2))
+      .join(' ') + '.',
+  expand: text => `${text} Furthermore, this topic deserves additional exploration.`,
+  'fix-grammar': text =>
+    text.charAt(0).toUpperCase() + text.slice(1).replace(/\s+/g, ' ').trim() + '.',
+  custom: text => `[Custom transformation of: "${text}"]`,
+};
+
+export async function generateText(options: GenerateTextOptions): Promise<string> {
+  const { text, action, useMock = true } = options;
+
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  if (useMock) {
+    return MOCK_RESPONSES[action](text);
+  }
+
+  // Real API call placeholder
+  // const response = await fetch('/api/ai/generate', { ... });
+  // return response.json();
+
+  return MOCK_RESPONSES[action](text);
+}
+```
+
+### 6.3 AI Assistant Module
 
 ```typescript
 // src/modules/AIAssistantModule.ts
@@ -2172,7 +1930,6 @@ import Quill from 'quill';
 import { generateText, AIPromptType } from '../utils/aiService';
 
 export interface AIAssistantOptions {
-  apiEndpoint?: string;
   useMock?: boolean;
 }
 
@@ -2191,33 +1948,20 @@ class AIAssistantModule {
 
   createToolbar() {
     this.toolbar = document.createElement('div');
-    this.toolbar.className = `
-      ai-toolbar hidden absolute z-50 bg-white dark:bg-gray-800
-      rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-2
-    `;
+    this.toolbar.className = 'ai-toolbar is-hidden';
 
     this.toolbar.innerHTML = `
-      <div class="flex gap-1">
-        <button data-action="improve" class="ai-btn px-3 py-1.5 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          ✨ Improve
-        </button>
-        <button data-action="simplify" class="ai-btn px-3 py-1.5 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          📝 Simplify
-        </button>
-        <button data-action="expand" class="ai-btn px-3 py-1.5 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          📖 Expand
-        </button>
-        <button data-action="fix-grammar" class="ai-btn px-3 py-1.5 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          🔤 Fix Grammar
-        </button>
-        <button data-action="custom" class="ai-btn px-3 py-1.5 text-sm rounded bg-purple-600 text-white hover:bg-purple-700">
-          🤖 Ask Copilot
-        </button>
+      <div class="ai-toolbar-buttons">
+        <button data-action="improve" class="ai-btn">✨ Improve</button>
+        <button data-action="simplify" class="ai-btn">📝 Simplify</button>
+        <button data-action="expand" class="ai-btn">📖 Expand</button>
+        <button data-action="fix-grammar" class="ai-btn">🔤 Fix Grammar</button>
+        <button data-action="custom" class="ai-btn ai-btn-primary">🤖 Ask Copilot</button>
       </div>
     `;
 
     this.toolbar.querySelectorAll('.ai-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', e => {
         const action = (e.target as HTMLElement).getAttribute('data-action');
         if (action) this.handleAction(action as AIPromptType);
       });
@@ -2235,9 +1979,9 @@ class AIAssistantModule {
 
       this.toolbar.style.left = `${editorRect.left + bounds.left}px`;
       this.toolbar.style.top = `${editorRect.top + bounds.top - 50}px`;
-      this.toolbar.classList.remove('hidden');
+      this.toolbar.classList.remove('is-hidden');
     } else {
-      this.toolbar.classList.add('hidden');
+      this.toolbar.classList.add('is-hidden');
     }
   }
 
@@ -2250,12 +1994,10 @@ class AIAssistantModule {
     if (action === 'custom') {
       const prompt = window.prompt('What would you like to do with this text?');
       if (!prompt) return;
-      // Handle custom prompt
     }
 
     try {
-      // Show loading state
-      this.toolbar?.classList.add('hidden');
+      this.toolbar?.classList.add('is-hidden');
 
       const result = await generateText({
         text: selectedText,
@@ -2263,10 +2005,8 @@ class AIAssistantModule {
         useMock: this.options.useMock,
       });
 
-      // Replace selected text with result
       this.quill.deleteText(range.index, range.length);
       this.quill.insertText(range.index, result);
-
     } catch (error) {
       console.error('AI Assistant error:', error);
     }
@@ -2276,67 +2016,20 @@ class AIAssistantModule {
 export default AIAssistantModule;
 ```
 
-### AI Service (Mock/Real)
-
-```typescript
-// src/utils/aiService.ts
-
-export type AIPromptType = 'improve' | 'simplify' | 'expand' | 'fix-grammar' | 'custom';
-
-interface GenerateTextOptions {
-  text: string;
-  action: AIPromptType;
-  customPrompt?: string;
-  useMock?: boolean;
-}
-
-// Mock responses for demo
-const MOCK_RESPONSES: Record<AIPromptType, (text: string) => string> = {
-  improve: (text) => `${text} [improved with better clarity and flow]`,
-  simplify: (text) => text.split(' ').slice(0, Math.ceil(text.split(' ').length / 2)).join(' ') + '.',
-  expand: (text) => `${text} Furthermore, this topic deserves additional exploration. Let me elaborate on the key points mentioned above.`,
-  'fix-grammar': (text) => text.charAt(0).toUpperCase() + text.slice(1).replace(/\s+/g, ' ').trim() + '.',
-  custom: (text) => `[Custom transformation of: "${text}"]`,
-};
-
-export async function generateText(options: GenerateTextOptions): Promise<string> {
-  const { text, action, useMock = true } = options;
-
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
-  if (useMock) {
-    return MOCK_RESPONSES[action](text);
-  }
-
-  // Real API call (when ready)
-  // const response = await fetch('/api/ai/generate', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ text, action, prompt: options.customPrompt }),
-  // });
-  // return response.json();
-
-  return MOCK_RESPONSES[action](text);
-}
-```
-
-### Registering the AI Module
+### 6.4 Registering AI Module
 
 ```typescript
 // src/modules/index.ts
 
 import Quill from 'quill';
 import AIAssistantModule from './AIAssistantModule';
-import MentionModule from './MentionModule';
 
 export function registerModules() {
   Quill.register('modules/aiAssistant', AIAssistantModule);
-  Quill.register('modules/mention', MentionModule);
 }
 ```
 
-### Using AI Module in Editor
+### 6.5 Using AI Module in Editor
 
 ```typescript
 // In Editor initialization
@@ -2345,8 +2038,7 @@ const quill = new Quill(container, {
   modules: {
     toolbar: [...],
     aiAssistant: {
-      useMock: true, // Set to false for real API
-      apiEndpoint: '/api/ai/generate',
+      useMock: true,
     },
   },
 });
@@ -2354,565 +2046,96 @@ const quill = new Quill(container, {
 
 ---
 
-## Working with Delta
-
-### Delta Structure
-
-Delta is Quill's format for representing content:
-
-```typescript
-import { Delta } from 'quill/core';
-
-// Creating content
-const content = new Delta()
-  .insert('Hello ', { bold: true })
-  .insert('World')
-  .insert('\n', { header: 1 });
-```
-
-### Common Operations
-
-```typescript
-// Get content
-const delta = quill.getContents();
-
-// Set content
-quill.setContents(delta);
-
-// Get plain text
-const text = quill.getText();
-
-// Apply changes
-const change = new Delta().retain(5).delete(3).insert('new text');
-quill.updateContents(change);
-```
-
-## Event Handling
-
-### Text Change Event
-
-```typescript
-quill.on('text-change', (delta, oldDelta, source) => {
-  // delta: The change that occurred
-  // oldDelta: Previous document state
-  // source: 'user' | 'api' | 'silent'
-
-  if (source === 'user') {
-    console.log('User made a change:', delta);
-  }
-});
-```
-
-### Selection Change Event
-
-```typescript
-quill.on('selection-change', (range, oldRange, source) => {
-  if (range === null) {
-    console.log('Editor lost focus');
-  } else if (range.length === 0) {
-    console.log('Cursor at index:', range.index);
-  } else {
-    console.log('Selection:', range.index, 'to', range.index + range.length);
-  }
-});
-```
-
-## App Integration Example
-
-```tsx
-// src/App.tsx
-
-import { useRef, useState, useCallback } from 'react';
-import Quill from 'quill';
-import { Delta } from 'quill/core';
-import Editor from './components/Editor';
-
-function App() {
-  const quillRef = useRef<Quill | null>(null);
-  const [readOnly, setReadOnly] = useState(false);
-
-  const initialContent = new Delta()
-    .insert('Welcome to the Editor')
-    .insert('\n', { header: 1 })
-    .insert('Start typing here...')
-    .insert('\n');
-
-  const handleTextChange = useCallback((delta: Delta) => {
-    console.log('Content changed:', delta);
-  }, []);
-
-  const handleGetContent = () => {
-    if (quillRef.current) {
-      const content = quillRef.current.getContents();
-      console.log('Current content:', JSON.stringify(content));
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-            React Quill Editor
-          </h1>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setReadOnly(!readOnly)}
-              className="px-4 py-2 text-sm font-medium rounded-md
-                bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600
-                text-gray-700 dark:text-gray-200 transition-colors"
-            >
-              {readOnly ? 'Enable Editing' : 'Disable Editing'}
-            </button>
-            <button
-              onClick={handleGetContent}
-              className="px-4 py-2 text-sm font-medium rounded-md
-                bg-blue-600 hover:bg-blue-700 text-white transition-colors"
-            >
-              Get Content
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        <Editor
-          ref={quillRef}
-          defaultValue={initialContent}
-          readOnly={readOnly}
-          placeholder="Write something amazing..."
-          theme="snow"
-          onTextChange={handleTextChange}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
-        />
-      </main>
-    </div>
-  );
-}
-
-export default App;
-```
-
-## Styling with Tailwind CSS
-
-### Tailwind CSS Setup
-
-#### Installation
-
-```bash
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
-```
-
-#### Tailwind Configuration
-
-```javascript
-// tailwind.config.js
-
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  darkMode: 'class', // or 'media' for automatic
-  theme: {
-    extend: {
-      // Custom colors for editor if needed
-      colors: {
-        editor: {
-          toolbar: '#f8f9fa',
-          border: '#dee2e6',
-        }
-      }
-    },
-  },
-  plugins: [],
-}
-```
-
-#### Main CSS File
-
-```css
-/* src/index.css */
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Quill theme imports */
-@import 'quill/dist/quill.snow.css';
-@import 'quill/dist/quill.bubble.css';
-
-/* Quill editor customizations using Tailwind's @apply */
-@layer components {
-  /* Editor container flex behavior */
-  .ql-container {
-    @apply flex-1 overflow-auto text-base;
-  }
-
-  .ql-editor {
-    @apply min-h-full;
-  }
-
-  /* Placeholder styling */
-  .ql-editor.ql-blank::before {
-    @apply text-gray-400 italic;
-  }
-
-  /* Snow theme toolbar customization */
-  .ql-snow .ql-toolbar {
-    @apply bg-gray-50 border-gray-200 rounded-t-lg;
-  }
-
-  .ql-snow .ql-container {
-    @apply border-gray-200 rounded-b-lg;
-  }
-
-  /* Dark mode support */
-  .dark .ql-snow .ql-toolbar {
-    @apply bg-gray-700 border-gray-600;
-  }
-
-  .dark .ql-snow .ql-container {
-    @apply bg-gray-800 border-gray-600 text-white;
-  }
-
-  .dark .ql-snow .ql-stroke {
-    stroke: #fff;
-  }
-
-  .dark .ql-snow .ql-fill {
-    fill: #fff;
-  }
-
-  .dark .ql-snow .ql-picker-label {
-    @apply text-white;
-  }
-
-  .dark .ql-snow .ql-picker-options {
-    @apply bg-gray-700;
-  }
-
-  .dark .ql-editor.ql-blank::before {
-    @apply text-gray-500;
-  }
-}
-```
-
-### Using Tailwind Classes in Components
-
-The Editor component uses Tailwind classes directly:
-
-```tsx
-// Editor container with Tailwind
-<div
-  ref={containerRef}
-  className={`flex flex-col h-96 ${className}`}
-/>
-
-// Usage with custom classes
-<Editor
-  className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
-/>
-```
-
-### Common Tailwind Patterns for Editor
-
-```tsx
-// Full-height editor
-<Editor className="h-full min-h-[500px]" />
-
-// Fixed height with scroll
-<Editor className="h-96 overflow-hidden" />
-
-// Responsive height
-<Editor className="h-64 md:h-96 lg:h-[600px]" />
-
-// With custom border radius
-<Editor className="rounded-xl overflow-hidden" />
-
-// With focus ring
-<Editor className="focus-within:ring-2 focus-within:ring-blue-500" />
-```
-
-### Custom Toolbar with Tailwind (HTML-based)
-
-```tsx
-<div id="toolbar" className="flex flex-wrap gap-1 p-2 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-  <div className="flex gap-1">
-    <button className="ql-bold p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded" />
-    <button className="ql-italic p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded" />
-    <button className="ql-underline p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded" />
-  </div>
-  <div className="w-px bg-gray-300 dark:bg-gray-500 mx-1" /> {/* Divider */}
-  <div className="flex gap-1">
-    <button className="ql-list p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded" value="ordered" />
-    <button className="ql-list p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded" value="bullet" />
-  </div>
-</div>
-```
-
-## Optional Enhancements
-
-### 1. Syntax Highlighting (Code Blocks)
-
-```typescript
-import hljs from 'highlight.js';
-import 'highlight.js/styles/github.css';
-
-// Register with Quill
-Quill.register('modules/syntax', true);
-
-// Configure
-const quill = new Quill(container, {
-  modules: {
-    syntax: {
-      highlight: (text: string) => hljs.highlightAuto(text).value,
-    },
-    toolbar: [...],
-  },
-});
-```
-
-### 2. Image Upload Handler
-
-```typescript
-const quill = new Quill(container, {
-  modules: {
-    toolbar: {
-      container: toolbarOptions,
-      handlers: {
-        image: function() {
-          const input = document.createElement('input');
-          input.setAttribute('type', 'file');
-          input.setAttribute('accept', 'image/*');
-          input.click();
-
-          input.onchange = async () => {
-            const file = input.files?.[0];
-            if (file) {
-              const url = await uploadImage(file); // Your upload function
-              const range = this.quill.getSelection();
-              this.quill.insertEmbed(range.index, 'image', url);
-            }
-          };
-        },
-      },
-    },
-  },
-});
-```
-
-### 3. Auto-save Hook
-
-```typescript
-// src/hooks/useAutoSave.ts
-
-import { useEffect, useRef } from 'react';
-import type Quill from 'quill';
-
-export function useAutoSave(
-  quillRef: React.RefObject<Quill | null>,
-  saveInterval: number = 30000,
-  onSave: (content: string) => Promise<void>
-) {
-  const lastSavedRef = useRef<string>('');
-
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      const quill = quillRef.current;
-      if (!quill) return;
-
-      const content = JSON.stringify(quill.getContents());
-      if (content !== lastSavedRef.current) {
-        await onSave(content);
-        lastSavedRef.current = content;
-      }
-    }, saveInterval);
-
-    return () => clearInterval(interval);
-  }, [quillRef, saveInterval, onSave]);
-}
-```
-
-## TypeScript Support
-
-### Type Definitions
-
-Quill v2 includes TypeScript definitions. Key types:
-
-```typescript
-import Quill from 'quill';
-import { Delta } from 'quill/core';
-
-// Quill instance type
-type QuillInstance = InstanceType<typeof Quill>;
-
-// Event types
-type TextChangeHandler = (delta: Delta, oldDelta: Delta, source: string) => void;
-type SelectionChangeHandler = (range: Range | null, oldRange: Range | null, source: string) => void;
-
-// Range type
-interface Range {
-  index: number;
-  length: number;
-}
-```
-
-## Dependencies
-
-### Required
-
-```json
-{
-  "dependencies": {
-    "quill": "^2.0.3",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "highlight.js": "^11.9.0"
-  },
-  "devDependencies": {
-    "typescript": "~5.9.3",
-    "tailwindcss": "^4.0.0",
-    "postcss": "^8.4.49",
-    "autoprefixer": "^10.4.20",
-    "sass": "^1.77.0",
-    "eslint": "^9.39.1",
-    "@eslint/js": "^9.39.1",
-    "typescript-eslint": "^8.33.1",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
-    "prettier": "^3.3.0",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-prettier": "^5.5.1",
-    "globals": "^16.2.0"
-  }
-}
-```
-
-### Optional (for enhanced features)
-
-```json
-{
-  "dependencies": {
-    "katex": "^0.16.9"
-  }
-}
-```
-
 ## Implementation Checklist
 
-### Phase 0: Development Environment Setup
-- [ ] **ESLint Setup**
-  - [ ] Install ESLint and plugins
-  - [ ] Create `eslint.config.js` with TypeScript & React rules
-  - [ ] Add `lint` and `lint:fix` scripts to package.json
-- [ ] **Prettier Setup**
-  - [ ] Install Prettier
-  - [ ] Create `.prettierrc` configuration
-  - [ ] Create `.prettierignore`
-  - [ ] Add `format` and `format:check` scripts
-- [ ] **SCSS Setup**
-  - [ ] Install `sass` package
-  - [ ] Create `src/styles/` directory structure
-  - [ ] Create `_variables.scss` with theme colors
-  - [ ] Create `_mixins.scss` with reusable mixins
-  - [ ] Create `index.scss` entry point
-  - [ ] Configure Vite for SCSS with path aliases
-- [ ] **GitHub Actions CI/CD**
-  - [ ] Create `.github/workflows/ci.yml`
-  - [ ] Configure validate job (type-check, lint, format, build)
-  - [ ] Configure test job
-  - [ ] Configure deploy preview job (PR)
-  - [ ] Configure deploy production job (main branch)
-- [ ] **Dark Theme Infrastructure**
-  - [ ] Create `ThemeProvider` context
-  - [ ] Create `useTheme` hook
-  - [ ] Create `ThemeToggle` component
-  - [ ] Add `data-theme` attribute support
-  - [ ] Create `_dark-theme.scss` with Quill overrides
+### Phase 0: Project Setup
 
-### Phase 1: Core Editor Setup
-- [ ] Install dependencies (`npm install quill highlight.js`)
-- [ ] Install Tailwind CSS (`npm install -D tailwindcss postcss autoprefixer`)
-- [ ] Initialize Tailwind (`npx tailwindcss init -p`)
-- [ ] Configure `tailwind.config.js` with content paths and dark mode
-- [ ] Add Tailwind directives to `index.css`
-- [ ] Import Quill CSS themes
-- [ ] Create Editor component with forwardRef pattern
-- [ ] Implement useLayoutEffect for callback synchronization
-- [ ] Set up Quill initialization in useEffect
+- [ ] Initialize Vite project with React + TypeScript
+- [ ] Install all dependencies
+- [ ] Configure ESLint (`eslint.config.js`)
+- [ ] Configure Prettier (`.prettierrc`, `.prettierignore`)
+- [ ] Configure Stylelint (`.stylelintrc.json`)
+- [ ] Setup Husky with lint-staged
+- [ ] Create SCSS structure (`_variables.scss`, `_mixins.scss`, `index.scss`)
+- [ ] Configure Vite for SCSS
+- [ ] Setup GitHub Actions CI (`.github/workflows/ci.yml`)
+- [ ] Verify all linting passes
+
+### Phase 1: Core Editor
+
+- [ ] Create Editor component with forwardRef
+- [ ] Implement TypeScript interfaces
+- [ ] Add callback ref pattern
+- [ ] Setup Quill initialization in useEffect
 - [ ] Add proper cleanup on unmount
-- [ ] Add TypeScript interfaces
-- [ ] Add `className` prop for custom styling
+- [ ] Create Editor SCSS styles
+- [ ] Test basic editor functionality
 
-### Phase 2: Custom Blots (Core)
-- [ ] Create `src/blots/` directory structure
-- [ ] Implement base blot registration (`src/blots/index.ts`)
-- [ ] **Alert Blot** - Info, warning, error, success callouts
-- [ ] **Divider Blot** - Styled horizontal rules (5 variants)
-- [ ] **Checklist Blot** - Interactive checkboxes with state
-- [ ] **Mention Blot** - @user inline references
+### Phase 2: Dark Theme
 
-### Phase 3: Custom Blots (Advanced)
-- [ ] **Product Card Blot** - Embedded product with image, price, CTA
-- [ ] **Code Block Blot** - Syntax highlighting with language selector
-- [ ] **Embed Blot** - YouTube, Twitter, custom embeds
-- [ ] **Collapsible Blot** - Expandable content sections
-- [ ] **Table Blot** - Enhanced table with headers
+- [ ] Create ThemeProvider context
+- [ ] Create useTheme hook
+- [ ] Create ThemeToggle component
+- [ ] Add CSS custom properties for theming
+- [ ] Create `_dark-theme.scss` with Quill overrides
+- [ ] Test theme persistence in localStorage
 
-### Phase 4: AI Assistant (Ask Copilot)
-- [ ] Create `src/modules/AIAssistantModule.ts`
-- [ ] Create `src/utils/aiService.ts` with mock responses
-- [ ] Implement selection-based AI toolbar
-- [ ] Add "Improve", "Simplify", "Expand", "Fix Grammar" actions
-- [ ] Add "Ask Copilot" custom prompt action
-- [ ] **AI Assistant Blot** - Loading/suggestion states
-- [ ] Test AI module integration
+### Phase 3: Simple Blots
 
-### Phase 5: Styling & Polish
-- [ ] Create `_quill-overrides.scss` for base theme customization
-- [ ] Create `_blots.scss` for custom blot styles
-- [ ] Implement dark mode support for all blots in `_dark-theme.scss`
-- [ ] Style editor container with Tailwind + SCSS
-- [ ] Add custom toolbar with blot insertion buttons
-- [ ] Test all blots with Delta serialization/deserialization
-- [ ] Support both themes (snow/bubble)
-- [ ] Test dark/light theme toggle
+- [ ] Create blots registration (`src/blots/index.ts`)
+- [ ] Implement Divider Blot (5 variants)
+- [ ] Implement Alert Blot (4 types)
+- [ ] Create `_blots.scss` styles
+- [ ] Test Delta serialization/deserialization
 
-### Phase 6: Demo & Documentation
-- [ ] Create demo page showcasing all blots
-- [ ] Add sample content demonstrating each blot type
+### Phase 4: Medium Complexity Blots
+
+- [ ] Implement Mention Blot
+- [ ] Implement Checklist Blot (interactive checkboxes)
+- [ ] Implement Collapsible Blot
+- [ ] Implement Code Block Blot (with copy button)
+- [ ] Implement Embed Blot (YouTube, Twitter)
+- [ ] Add styles for all blots
+- [ ] Test all interactions
+
+### Phase 5: Complex Blots
+
+- [ ] Implement Product Card Blot
+- [ ] Implement Enhanced Table Blot
+- [ ] Add dark mode support for complex blots
+- [ ] Test all blots
+
+### Phase 6: AI Assistant
+
+- [ ] Create AI Service with mock responses
+- [ ] Implement AI Assistant Blot
+- [ ] Create AI Assistant Module
+- [ ] Add selection-based toolbar
+- [ ] Implement all AI actions (improve, simplify, expand, fix-grammar, custom)
+- [ ] Test AI integration
+
+### Phase 7: Demo & Documentation
+
+- [ ] Create demo page with all blots
+- [ ] Add sample content
 - [ ] Test Delta export/import
-- [ ] Document usage examples
-- [ ] Set up Vercel/Netlify deployment
-- [ ] Configure GitHub Actions for auto-deploy
-- [ ] Verify CI checks pass on PRs
+- [ ] Deploy to Vercel/Netlify
+- [ ] Verify CI/CD pipeline
 
-### Skills Demonstrated
-- [ ] Deep DOM manipulation (custom blot rendering)
-- [ ] Library extension (Quill Blot API)
-- [ ] Data structures (Delta format)
-- [ ] React integration patterns (forwardRef, useLayoutEffect)
-- [ ] TypeScript interfaces for custom data structures
-- [ ] Event handling and state synchronization
-- [ ] AI integration patterns (mock/real API)
+---
 
 ## References
 
 ### Quill
-- [Quill Official Documentation](https://quilljs.com/docs)
+
+- [Quill Documentation](https://quilljs.com/docs)
 - [Quill React Playground](https://quilljs.com/playground/react)
-- [Quill GitHub Repository](https://github.com/slab/quill)
 - [Delta Documentation](https://quilljs.com/docs/delta)
 - [Parchment (Blot API)](https://github.com/slab/parchment)
-- [Quill Modules Guide](https://quilljs.com/docs/modules)
 
-### Styling
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Tailwind CSS with Vite](https://tailwindcss.com/docs/guides/vite)
+### Development Tools
 
-### Code Highlighting
-- [highlight.js](https://highlightjs.org/)
-- [highlight.js Supported Languages](https://highlightjs.org/static/demo/)
+- [ESLint Documentation](https://eslint.org/docs/latest/)
+- [Prettier Documentation](https://prettier.io/docs/en/)
+- [Stylelint Documentation](https://stylelint.io/)
+- [Husky Documentation](https://typicode.github.io/husky/)

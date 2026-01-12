@@ -7,6 +7,5 @@
   "bracketSpacing": true,
   "arrowParens": "avoid",
   "endOfLine": "lf",
-  "jsxSingleQuote": false,
-  "plugins": []
+  "jsxSingleQuote": false
 }

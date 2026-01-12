@@ -1,0 +1,105 @@
+@import 'tailwindcss';
+
+/* Custom theme variables */
+:root {
+  --editor-bg: #fff;
+  --editor-border: #e5e7eb;
+  --toolbar-bg: #f9fafb;
+  --toolbar-hover: #f3f4f6;
+  --toolbar-active: #e5e7eb;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+}
+
+[data-theme='dark'] {
+  --editor-bg: #1f2937;
+  --editor-border: #374151;
+  --toolbar-bg: #111827;
+  --toolbar-hover: #1f2937;
+  --toolbar-active: #374151;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+/* Hide default Quill toolbar - we use custom */
+.ql-toolbar.ql-snow {
+  display: none;
+}
+
+/* Quill editor container styling */
+.ql-container.ql-snow {
+  border: none;
+  font-size: 1rem;
+}
+
+.ql-editor {
+  color: var(--text-primary);
+  line-height: 1.75;
+  min-height: 300px;
+  padding: 1rem 1.25rem;
+}
+
+.ql-editor.ql-blank::before {
+  color: var(--text-secondary);
+  font-style: normal;
+}
+
+/* Quill content styles */
+.ql-editor h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.ql-editor h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.ql-editor h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.ql-editor p {
+  margin-bottom: 0.75rem;
+}
+
+.ql-editor blockquote {
+  border-left: 4px solid #3b82f6;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 1rem 0;
+  padding-left: 1rem;
+}
+
+.ql-editor pre.ql-syntax {
+  background-color: #1e293b;
+  border-radius: 0.5rem;
+  color: #e2e8f0;
+  font-family: 'Fira Code', Consolas, monospace;
+  font-size: 0.875rem;
+  overflow-x: auto;
+  padding: 1rem;
+}
+
+.ql-editor ul,
+.ql-editor ol {
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+}
+
+.ql-editor a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.ql-editor a:hover {
+  color: #2563eb;
+}
