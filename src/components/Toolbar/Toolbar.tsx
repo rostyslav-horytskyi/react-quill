@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef, useEffect } from 'react';
+import { useCallback } from 'react';
 import type Quill from 'quill';
 import {
   Bold,
@@ -11,11 +11,6 @@ import {
   Code,
   Link,
   Image,
-  Heading1,
-  Heading2,
-  Heading3,
-  Heading4,
-  Type,
   Palette,
   Highlighter,
   RemoveFormatting,
@@ -24,117 +19,13 @@ import {
   AlignRight,
   AlignJustify,
   Minus,
-  ChevronDown,
 } from 'lucide-react';
+import HeadingDropdown from './components/HeadingDropdown/HeadingDropdown.tsx';
+import ToolbarDivider from './components/ToolbarDivider/ToolbarDivider.tsx';
+import ToolbarButton from './components/ToolbarButton/ToolbarButton.tsx';
 
 interface ToolbarProps {
   quill: Quill | null;
-}
-
-interface ToolbarButtonProps {
-  icon: React.ReactNode;
-  title: string;
-  onClick: () => void;
-  isActive?: boolean;
-}
-
-function ToolbarButton({ icon, title, onClick, isActive }: ToolbarButtonProps) {
-  return (
-    <button
-      type="button"
-      title={title}
-      onClick={onClick}
-      className={`
-        p-2 rounded-lg transition-all duration-150
-        hover:bg-gray-100 dark:hover:bg-gray-700
-        active:scale-95
-        ${isActive ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}
-      `}
-    >
-      {icon}
-    </button>
-  );
-}
-
-function ToolbarDivider() {
-  return <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />;
-}
-
-interface HeadingOption {
-  value: number | false;
-  icon: React.ReactNode;
-}
-
-interface HeadingDropdownProps {
-  onSelect: (level: number | false) => void;
-}
-
-function HeadingDropdown({ onSelect }: HeadingDropdownProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState<HeadingOption | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const options: HeadingOption[] = [
-    { value: 1, icon: <Heading1 size={18} /> },
-    { value: 2, icon: <Heading2 size={18} /> },
-    { value: 3, icon: <Heading3 size={18} /> },
-    { value: 4, icon: <Heading4 size={18} /> },
-    { value: false, icon: <Type size={18} /> },
-  ];
-
-  const defaultOption = options[options.length - 1];
-  const currentOption = selected || defaultOption;
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleSelect = (option: HeadingOption) => {
-    setSelected(option);
-    onSelect(option.value);
-    setIsOpen(false);
-  };
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all duration-150 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm font-medium min-w-[60px]"
-      >
-        <span className="flex items-center gap-2">{currentOption.icon}</span>
-        <ChevronDown
-          size={14}
-          className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-        />
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 overflow-hidden">
-          {options.map(option => (
-            <button
-              key={String(option.value)}
-              type="button"
-              onClick={() => handleSelect(option)}
-              className={`w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                currentOption.value === option.value
-                  ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                  : 'text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              {option.icon}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
 }
 
 export default function Toolbar({ quill }: ToolbarProps) {
