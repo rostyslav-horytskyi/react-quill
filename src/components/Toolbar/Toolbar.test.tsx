@@ -36,25 +36,25 @@ describe('<Toolbar />', () => {
   });
 
   describe('Format Buttons', () => {
-    it('should render bold button', () => {
+    it('should contain bold button', () => {
       render(<Toolbar />);
 
       expect(screen.getByTitle('Bold (Ctrl+B)')).toBeInTheDocument();
     });
 
-    it('should render italic button', () => {
+    it('should contain italic button', () => {
       render(<Toolbar />);
 
       expect(screen.getByTitle('Italic (Ctrl+I)')).toBeInTheDocument();
     });
 
-    it('should render underline button', () => {
+    it('should contain underline button', () => {
       render(<Toolbar />);
 
       expect(screen.getByTitle('Underline (Ctrl+U)')).toBeInTheDocument();
     });
 
-    it('should render strikethrough button', () => {
+    it('should contain strikethrough button', () => {
       render(<Toolbar />);
 
       expect(screen.getByTitle('Strikethrough')).toBeInTheDocument();
@@ -62,19 +62,19 @@ describe('<Toolbar />', () => {
   });
 
   describe('Block Buttons', () => {
-    it('should render quote button', () => {
+    it('should contain quote button', () => {
       render(<Toolbar />);
 
       expect(screen.getByTitle('Quote')).toBeInTheDocument();
     });
 
-    it('should render code block button', () => {
+    it('should contain code block button', () => {
       render(<Toolbar />);
 
       expect(screen.getByTitle('Code block')).toBeInTheDocument();
     });
 
-    it('should render divider button', () => {
+    it('should contain divider button', () => {
       render(<Toolbar />);
 
       expect(screen.getByTitle('Divider')).toBeInTheDocument();
@@ -82,13 +82,13 @@ describe('<Toolbar />', () => {
   });
 
   describe('Insert Buttons', () => {
-    it('should render link button', () => {
+    it('should contain link button', () => {
       render(<Toolbar />);
 
       expect(screen.getByTitle('Insert link')).toBeInTheDocument();
     });
 
-    it('should render image button', () => {
+    it('should contain image button', () => {
       render(<Toolbar />);
 
       expect(screen.getByTitle('Insert image')).toBeInTheDocument();
@@ -96,13 +96,13 @@ describe('<Toolbar />', () => {
   });
 
   describe('Color Buttons', () => {
-    it('should render text color button', () => {
+    it('should contain text color button', () => {
       render(<Toolbar />);
 
       expect(screen.getByTitle('Text color')).toBeInTheDocument();
     });
 
-    it('should render highlight button', () => {
+    it('should contain highlight button', () => {
       render(<Toolbar />);
 
       expect(screen.getByTitle('Highlight')).toBeInTheDocument();
@@ -110,7 +110,7 @@ describe('<Toolbar />', () => {
   });
 
   describe('Clear Format Button', () => {
-    it('should render clear formatting button', () => {
+    it('should contain clear formatting button', () => {
       render(<Toolbar />);
 
       expect(screen.getByTitle('Clear formatting')).toBeInTheDocument();
@@ -123,12 +123,13 @@ describe('<Toolbar />', () => {
 
       const dropdown = screen.getByTestId('heading-dropdown');
       const trigger = dropdown.querySelector('button');
+
       expect(trigger).toBeInTheDocument();
 
       await user.click(trigger!);
 
-      // After clicking, dropdown options should be visible
-      const dropdownMenu = dropdown.querySelector('.absolute');
+      const dropdownMenu = screen.getByTestId('toolbar-dropdown-menu');
+
       expect(dropdownMenu).toBeInTheDocument();
     });
 
