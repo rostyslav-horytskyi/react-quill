@@ -7,3 +7,49 @@
     min-height: 350px;
   }
 }
+
+// Mixin for custom ordered list styles at different indent levels
+@mixin custom-list-style($type, $style) {
+  .ql-editor li[data-list='#{$type}'] {
+    counter-increment: list-0;
+
+    > .ql-ui::before {
+      content: counter(list-0, $style) '. ';
+    }
+  }
+
+  @for $i from 1 through 8 {
+    .ql-editor li[data-list='#{$type}'].ql-indent-#{$i} {
+      counter-increment: list-#{$i};
+
+      > .ql-ui::before {
+        content: counter(list-#{$i}, $style) '. ';
+      }
+    }
+  }
+}
+
+// Apply custom ordered list styles
+@include custom-list-style('lower-alpha', lower-alpha);
+@include custom-list-style('upper-alpha', upper-alpha);
+@include custom-list-style('lower-roman', lower-roman);
+@include custom-list-style('upper-roman', upper-roman);
+@include custom-list-style('lower-greek', lower-greek);
+
+// Mixin for custom unordered list styles at all indent levels
+@mixin custom-bullet-style($type, $symbol) {
+  .ql-editor li[data-list='#{$type}'] > .ql-ui:before {
+    content: '#{$symbol}';
+  }
+
+  @for $i from 1 through 8 {
+    .ql-editor li[data-list='#{$type}'].ql-indent-#{$i} > .ql-ui:before {
+      content: '#{$symbol}';
+    }
+  }
+}
+
+// Apply custom unordered list styles
+@include custom-bullet-style('circle', '○');
+@include custom-bullet-style('disc', '●');
+@include custom-bullet-style('square', '■');

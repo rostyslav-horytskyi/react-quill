@@ -42,10 +42,13 @@ export function QuillProvider({ children }: QuillProviderProps) {
     };
 
     const handleTextChange = () => {
-      const range = quill.getSelection();
-      if (range) {
-        setFormats(quill.getFormat(range.index, range.length) as EditorFormats);
-      }
+      // Defer format check to next tick - selection hasn't updated yet when this fires
+      requestAnimationFrame(() => {
+        const range = quill.getSelection();
+        if (range) {
+          setFormats(quill.getFormat(range.index, range.length) as EditorFormats);
+        }
+      });
     };
 
     quill.on('selection-change', handleSelectionChange);

@@ -1,10 +1,13 @@
 import { forwardRef, useRef, useEffect, useLayoutEffect } from 'react';
 import Quill from 'quill';
+import CustomList from '../../quill/formats/list.ts';
 import 'quill/dist/quill.snow.css';
 import 'quill/dist/quill.bubble.css';
 import type { EditorProps } from './types';
 import { useQuill } from '../../context';
 import './Editor.scss';
+
+Quill.register('formats/list', CustomList, true);
 
 const Editor = forwardRef<Quill | null, EditorProps>((props, ref) => {
   const { setQuill } = useQuill();

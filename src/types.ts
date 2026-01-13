@@ -3,7 +3,17 @@ export interface EditorFormats {
   italic?: boolean;
   underline?: boolean;
   strike?: boolean;
-  list?: 'bullet' | 'ordered';
+  list?:
+    | 'bullet'
+    | 'ordered'
+    | 'lower-alpha'
+    | 'upper-alpha'
+    | 'lower-roman'
+    | 'upper-roman'
+    | 'lower-greek'
+    | 'circle'
+    | 'disc'
+    | 'square';
   align?: string | false;
   blockquote?: boolean;
   'code-block'?: boolean;
