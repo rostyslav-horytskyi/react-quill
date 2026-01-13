@@ -26,6 +26,7 @@ export default function AlignmentDropdown() {
       value={formats.align ?? false}
       onChange={handleChange}
       defaultValue={false}
+      data-testid="alignment-dropdown"
     />
   );
 }

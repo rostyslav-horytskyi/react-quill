@@ -42,6 +42,7 @@ export default function OrderedListDropdown() {
       onButtonClick={handleButtonClick}
       onOptionSelect={handleOptionSelect}
       isActive={isActive}
+      data-testid="ordered-list-dropdown"
     />
   );
 }

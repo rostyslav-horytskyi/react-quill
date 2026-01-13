@@ -27,6 +27,7 @@ export default function HeadingDropdown() {
       value={formats.header ?? false}
       onChange={handleChange}
       defaultValue={false}
+      data-testid="heading-dropdown"
     />
   );
 }

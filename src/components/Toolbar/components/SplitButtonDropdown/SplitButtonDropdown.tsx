@@ -13,6 +13,7 @@ interface SplitButtonDropdownProps<T> {
   onButtonClick: () => void;
   onOptionSelect: (value: T) => void;
   isActive?: boolean;
+  'data-testid'?: string;
 }
 
 export default function SplitButtonDropdown<T>({
@@ -22,6 +23,7 @@ export default function SplitButtonDropdown<T>({
   onButtonClick,
   onOptionSelect,
   isActive,
+  'data-testid': testId,
 }: SplitButtonDropdownProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -45,7 +47,7 @@ export default function SplitButtonDropdown<T>({
   };
 
   return (
-    <div className={'relative flex'} ref={dropdownRef}>
+    <div className={'relative flex'} ref={dropdownRef} data-testid={testId}>
       {/* Trigger button */}
       <button
         type={'button'}

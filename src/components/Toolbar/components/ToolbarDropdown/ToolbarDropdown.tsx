@@ -12,6 +12,7 @@ interface ToolbarDropdownProps<T> {
   value: T;
   onChange: (value: T) => void;
   defaultValue?: T;
+  'data-testid'?: string;
 }
 
 export default function ToolbarDropdown<T>({
@@ -19,6 +20,7 @@ export default function ToolbarDropdown<T>({
   value,
   onChange,
   defaultValue,
+  'data-testid': testId,
 }: ToolbarDropdownProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -46,7 +48,7 @@ export default function ToolbarDropdown<T>({
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative" ref={dropdownRef} data-testid={testId}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
