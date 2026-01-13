@@ -103,7 +103,13 @@ const Editor = forwardRef<Quill | null, EditorProps>((props, ref) => {
     }
   }, [readOnly, ref]);
 
-  return <div ref={containerRef} className={`editor-container ${className}`}></div>;
+  return (
+    <div
+      ref={containerRef}
+      className={`editor-container ${className}`}
+      data-testid={'editor-container'}
+    />
+  );
 });
 
 Editor.displayName = 'Editor';

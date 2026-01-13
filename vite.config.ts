@@ -29,7 +29,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       reportsDirectory: './coverage',
-      exclude: ['node_modules/', 'src/test/', '**/*.d.ts', '**/*.config.*'],
+      exclude: ['node_modules/', 'src/test/', '**/*.d.ts', '**/*.config.*', '**/*.scss'],
       thresholds: {
         lines: 52,
         statements: 50,
