@@ -21,11 +21,12 @@ export function QuillProvider({ children }: QuillProviderProps) {
 
   const refreshFormats = useCallback(() => {
     if (!quill) return;
+
     const range = quill.getSelection();
     if (range) {
       setFormats(quill.getFormat(range.index, range.length) as EditorFormats);
     } else {
-      setFormats(quill.getFormat() as EditorFormats);
+      setFormats({});
     }
   }, [quill]);
 

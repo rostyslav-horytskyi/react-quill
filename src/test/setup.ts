@@ -27,3 +27,18 @@ globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }));
+
+// Mock Range methods required by Quill
+Range.prototype.getBoundingClientRect = vi.fn().mockReturnValue({
+  top: 0,
+  left: 0,
+  bottom: 0,
+  right: 0,
+  width: 0,
+  height: 0,
+  x: 0,
+  y: 0,
+  toJSON: vi.fn(),
+});
+
+Range.prototype.getClientRects = vi.fn().mockReturnValue([]);
