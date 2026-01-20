@@ -53,3 +53,44 @@
 @include custom-bullet-style('circle', '○');
 @include custom-bullet-style('disc', '●');
 @include custom-bullet-style('square', '■');
+
+// Font family styles
+.ql-font-arial {
+  font-family: Arial, sans-serif;
+}
+
+.ql-font-times-new-roman {
+  font-family: 'Times New Roman', Times, serif;
+}
+
+.ql-font-georgia {
+  font-family: Georgia, serif;
+}
+
+.ql-font-verdana {
+  font-family: Verdana, sans-serif;
+}
+
+.ql-font-courier-new {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.ql-font-trebuchet-ms {
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.ql-font-garamond {
+  font-family: Garamond, serif;
+}
+
+.ql-font-palatino {
+  font-family: 'Palatino Linotype', Palatino, serif;
+}
+
+.ql-font-tahoma {
+  font-family: Tahoma, sans-serif;
+}
+
+.ql-font-impact {
+  font-family: Impact, sans-serif;
+}

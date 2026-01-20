@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '../../test';
+import { render, screen, within } from '../../test';
 import Toolbar from './Toolbar';
 
 describe('<Toolbar />', () => {
@@ -232,12 +232,13 @@ describe('<Toolbar />', () => {
       const buttons = dropdown.querySelectorAll('button');
       await user.click(buttons[1]);
 
-      expect(screen.getByText('Default')).toBeInTheDocument();
-      expect(screen.getByText('Lower Alpha')).toBeInTheDocument();
-      expect(screen.getByText('Upper Alpha')).toBeInTheDocument();
-      expect(screen.getByText('Lower Roman')).toBeInTheDocument();
-      expect(screen.getByText('Upper Roman')).toBeInTheDocument();
-      expect(screen.getByText('Lower Greek')).toBeInTheDocument();
+      const dropdownMenu = within(dropdown);
+      expect(dropdownMenu.getByText('Default')).toBeInTheDocument();
+      expect(dropdownMenu.getByText('Lower Alpha')).toBeInTheDocument();
+      expect(dropdownMenu.getByText('Upper Alpha')).toBeInTheDocument();
+      expect(dropdownMenu.getByText('Lower Roman')).toBeInTheDocument();
+      expect(dropdownMenu.getByText('Upper Roman')).toBeInTheDocument();
+      expect(dropdownMenu.getByText('Lower Greek')).toBeInTheDocument();
     });
   });
 
@@ -288,10 +289,11 @@ describe('<Toolbar />', () => {
       const buttons = dropdown.querySelectorAll('button');
       await user.click(buttons[1]);
 
-      expect(screen.getByText('Default')).toBeInTheDocument();
-      expect(screen.getByText('Circle')).toBeInTheDocument();
-      expect(screen.getByText('Disc')).toBeInTheDocument();
-      expect(screen.getByText('Square')).toBeInTheDocument();
+      const dropdownMenu = within(dropdown);
+      expect(dropdownMenu.getByText('Default')).toBeInTheDocument();
+      expect(dropdownMenu.getByText('Circle')).toBeInTheDocument();
+      expect(dropdownMenu.getByText('Disc')).toBeInTheDocument();
+      expect(dropdownMenu.getByText('Square')).toBeInTheDocument();
     });
   });
 

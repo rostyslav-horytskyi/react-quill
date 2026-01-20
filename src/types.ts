@@ -3,6 +3,18 @@ export interface EditorFormats {
   italic?: boolean;
   underline?: boolean;
   strike?: boolean;
+  font?:
+    | 'arial'
+    | 'times-new-roman'
+    | 'georgia'
+    | 'verdana'
+    | 'courier-new'
+    | 'trebuchet-ms'
+    | 'garamond'
+    | 'palatino'
+    | 'tahoma'
+    | 'impact'
+    | false;
   list?:
     | 'bullet'
     | 'ordered'

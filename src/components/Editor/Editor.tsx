@@ -1,6 +1,7 @@
 import { forwardRef, useRef, useEffect, useLayoutEffect } from 'react';
 import Quill from 'quill';
 import CustomList from '../../quill/formats/list.ts';
+import '../../quill/formats/font';
 import 'quill/dist/quill.snow.css';
 import 'quill/dist/quill.bubble.css';
 import type { EditorProps } from './types';
