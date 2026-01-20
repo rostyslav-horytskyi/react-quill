@@ -1,4 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import type { MutableRefObject } from 'react';
+import type Quill from 'quill';
+import type { Delta } from 'quill/core';
 import { render, screen, waitFor } from '../../test';
 import Editor from './Editor';
 
@@ -9,6 +12,9 @@ beforeEach(() => {
 const mockOnTextChange = vi.fn();
 const mockOnSelectionChange = vi.fn();
 const mockOnReady = vi.fn();
+
+const toDelta = (text: string): Delta =>
+  ({ ops: [{ insert: text }, { insert: '\n' }] }) as unknown as Delta;
 
 describe('<Editor />', () => {
   it('should display the editor container', () => {
@@ -30,7 +36,7 @@ describe('<Editor />', () => {
   });
 
   it('should initialize with default content', async () => {
-    const defaultContent = { ops: [{ insert: 'Hello, World!' }, { insert: '\n' }] };
+    const defaultContent = toDelta('Hello, World!');
 
     render(<Editor defaultValue={defaultContent} />);
 
@@ -38,7 +44,7 @@ describe('<Editor />', () => {
   });
 
   it('should call onTextChange callback on text change', async () => {
-    const defaultContent = { ops: [{ insert: 'Hello' }, { insert: '\n' }] };
+    const defaultContent = toDelta('Hello');
 
     const { user } = render(
       <Editor defaultValue={defaultContent} onTextChange={mockOnTextChange} />
@@ -80,7 +86,7 @@ describe('<Editor />', () => {
   });
 
   it('should call onSelectionChange callback on selection change', async () => {
-    const defaultContent = { ops: [{ insert: 'Hello, World!' }, { insert: '\n' }] };
+    const defaultContent = toDelta('Hello, World!');
 
     const { user } = render(
       <Editor defaultValue={defaultContent} onSelectionChange={mockOnSelectionChange} />
@@ -111,7 +117,7 @@ describe('<Editor />', () => {
   });
 
   it('should expose Quill instance via ref', () => {
-    const quillRef = { current: null };
+    const quillRef: MutableRefObject<Quill | null> = { current: null };
 
     render(<Editor ref={quillRef} />);
 
@@ -120,7 +126,7 @@ describe('<Editor />', () => {
   });
 
   it('should toggle read-only mode dynamically', async () => {
-    const quillRef = { current: null };
+    const quillRef: MutableRefObject<Quill | null> = { current: null };
     const { rerender } = render(<Editor ref={quillRef} readOnly={false} />);
 
     expect(document.querySelector('.ql-editor')).toHaveAttribute('contenteditable', 'true');
@@ -131,7 +137,7 @@ describe('<Editor />', () => {
   });
 
   it('should pass delta, oldDelta, and source to onTextChange callback', async () => {
-    const defaultContent = { ops: [{ insert: 'Test' }, { insert: '\n' }] };
+    const defaultContent = toDelta('Test');
 
     const { user } = render(
       <Editor defaultValue={defaultContent} onTextChange={mockOnTextChange} />

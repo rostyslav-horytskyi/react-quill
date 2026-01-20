@@ -1,6 +1,6 @@
 import Quill from 'quill';
 
-const Font = Quill.import('attributors/class/font') as {
+const Font = Quill.import('formats/font') as {
   whitelist: string[];
 };
 
@@ -18,7 +18,7 @@ Font.whitelist = [
   'impact',
 ];
 
-Quill.register(Font, true);
+Quill.register('formats/font', Font, true);
 
 export const FONT_OPTIONS = [
   { value: false, label: 'Default' },

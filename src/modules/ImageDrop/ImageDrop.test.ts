@@ -6,9 +6,24 @@ const IMAGE_DATA_URL =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/xcAAwMCAO6u6E8AAAAASUVORK5CYII=';
 
 class FileReaderMock {
+  static EMPTY = 0;
+  static LOADING = 1;
+  static DONE = 2;
+
+  public error: DOMException | null = null;
   public result: string | ArrayBuffer | null = null;
-  public onload: ((this: FileReader, ev: ProgressEvent<FileReader>) => void) | null = null;
-  public onerror: ((this: FileReader, ev: ProgressEvent<FileReader>) => void) | null = null;
+  public onabort: ((ev: ProgressEvent<FileReader>) => void) | null = null;
+  public onload: ((ev: ProgressEvent<FileReader>) => void) | null = null;
+  public onerror: ((ev: ProgressEvent<FileReader>) => void) | null = null;
+  public onloadend: ((ev: ProgressEvent<FileReader>) => void) | null = null;
+  public onloadstart: ((ev: ProgressEvent<FileReader>) => void) | null = null;
+  public onprogress: ((ev: ProgressEvent<FileReader>) => void) | null = null;
+  public readyState = FileReaderMock.DONE;
+
+  abort() {}
+  readAsArrayBuffer() {}
+  readAsBinaryString() {}
+  readAsText() {}
 
   readAsDataURL() {
     this.result = IMAGE_DATA_URL;
@@ -39,7 +54,7 @@ const originalCaretRangeFromPoint = docWithCaret.caretRangeFromPoint;
 
 describe('ImageDrop module', () => {
   beforeEach(() => {
-    globalThis.FileReader = FileReaderMock as typeof FileReader;
+    globalThis.FileReader = FileReaderMock as unknown as typeof FileReader;
   });
 
   afterEach(() => {
@@ -47,7 +62,11 @@ describe('ImageDrop module', () => {
     if (originalCaretRangeFromPoint) {
       docWithCaret.caretRangeFromPoint = originalCaretRangeFromPoint;
     } else {
-      delete docWithCaret.caretRangeFromPoint;
+      delete (
+        docWithCaret as {
+          caretRangeFromPoint?: (x: number, y: number) => Range | null;
+        }
+      ).caretRangeFromPoint;
     }
     document.body.innerHTML = '';
     vi.restoreAllMocks();
