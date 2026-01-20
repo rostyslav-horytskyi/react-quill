@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect, useCallback, type ReactNode } from 'react';
+import { useState, useCallback, type ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
+import OutsideClickHandler from 'react-outside-click-handler';
 
 // Color palette - common colors for text and highlight
 const TEXT_COLORS = [
@@ -130,17 +131,6 @@ export default function ColorPicker({
   showColorBar = true,
 }: ColorPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const handleColorClick = useCallback(
     (color: string) => {
@@ -160,74 +150,76 @@ export default function ColorPicker({
   }, [onColorSelect]);
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        title={title}
-        className={`relative p-2 rounded-lg transition-all duration-150 active:scale-95 ${
-          currentColor
-            ? 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
-            : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
-        }`}
-      >
-        <span className="flex items-center">
-          {icon}
-          <ChevronDown size={10} className="ml-0.5" />
-        </span>
-        {showColorBar && (
-          <span
-            className="absolute left-1/2 -translate-x-1/2 w-4 h-1 rounded-sm"
-            style={{
-              backgroundColor: currentColor || '#999999',
-              bottom: '-1px',
-            }}
-          />
-        )}
-      </button>
-
-      {isOpen && (
-        <div
-          className="absolute top-full left-0 mt-1 p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
-          style={{ width: '220px' }}
+    <OutsideClickHandler onOutsideClick={() => setIsOpen(false)} display="contents">
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          title={title}
+          className={`relative p-2 rounded-lg transition-all duration-150 active:scale-95 ${
+            currentColor
+              ? 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+              : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
+          }`}
         >
-          {/* Clear color button */}
-          <button
-            type="button"
-            onClick={handleClearColor}
-            className="w-full text-left px-2 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded mb-2"
-          >
-            Clear color
-          </button>
+          <span className="flex items-center">
+            {icon}
+            <ChevronDown size={10} className="ml-0.5" />
+          </span>
+          {showColorBar && (
+            <span
+              className="absolute left-1/2 -translate-x-1/2 w-4 h-1 rounded-sm"
+              style={{
+                backgroundColor: currentColor || '#999999',
+                bottom: '-1px',
+              }}
+            />
+          )}
+        </button>
 
-          {/* Color grid */}
-          <div className="grid grid-cols-10 gap-1">
-            {colors.map((color, index) => (
-              <button
-                key={`${color}-${index}`}
-                type="button"
-                onClick={() => handleColorClick(color)}
-                title={color}
-                className={`w-5 h-5 rounded border transition-transform hover:scale-110 ${
-                  currentColor === color
-                    ? 'ring-2 ring-blue-500 ring-offset-1'
-                    : 'border-gray-300 dark:border-gray-600'
-                } ${color === 'transparent' ? 'bg-white dark:bg-gray-700' : ''}`}
-                style={{
-                  backgroundColor: color === 'transparent' ? undefined : color,
-                  backgroundImage:
-                    color === 'transparent'
-                      ? 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc)'
-                      : undefined,
-                  backgroundSize: color === 'transparent' ? '8px 8px' : undefined,
-                  backgroundPosition: color === 'transparent' ? '0 0, 4px 4px' : undefined,
-                }}
-              />
-            ))}
+        {isOpen && (
+          <div
+            className="absolute top-full left-0 mt-1 p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
+            style={{ width: '220px' }}
+          >
+            {/* Clear color button */}
+            <button
+              type="button"
+              onClick={handleClearColor}
+              className="w-full text-left px-2 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded mb-2"
+            >
+              Clear color
+            </button>
+
+            {/* Color grid */}
+            <div className="grid grid-cols-10 gap-1">
+              {colors.map((color, index) => (
+                <button
+                  key={`${color}-${index}`}
+                  type="button"
+                  onClick={() => handleColorClick(color)}
+                  title={color}
+                  className={`w-5 h-5 rounded border transition-transform hover:scale-110 ${
+                    currentColor === color
+                      ? 'ring-2 ring-blue-500 ring-offset-1'
+                      : 'border-gray-300 dark:border-gray-600'
+                  } ${color === 'transparent' ? 'bg-white dark:bg-gray-700' : ''}`}
+                  style={{
+                    backgroundColor: color === 'transparent' ? undefined : color,
+                    backgroundImage:
+                      color === 'transparent'
+                        ? 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc)'
+                        : undefined,
+                    backgroundSize: color === 'transparent' ? '8px 8px' : undefined,
+                    backgroundPosition: color === 'transparent' ? '0 0, 4px 4px' : undefined,
+                  }}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </OutsideClickHandler>
   );
 }
 
