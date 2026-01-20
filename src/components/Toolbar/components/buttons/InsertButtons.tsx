@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Link, Image } from 'lucide-react';
+import { Link } from 'lucide-react';
 import { useQuill } from '../../../../context';
 import ToolbarButton from '../ToolbarButton/ToolbarButton';
 
@@ -20,18 +20,6 @@ export default function InsertButtons() {
     }
   }, [quill, refreshFormats]);
 
-  const insertImage = useCallback(() => {
-    if (!quill) return;
-    const url = prompt('Enter image URL:');
-    if (url) {
-      const range = quill.getSelection();
-      if (range) {
-        quill.insertEmbed(range.index, 'image', url);
-        refreshFormats();
-      }
-    }
-  }, [quill, refreshFormats]);
-
   return (
     <div className="flex items-center gap-0.5">
       <ToolbarButton
@@ -40,7 +28,6 @@ export default function InsertButtons() {
         onClick={insertLink}
         isActive={!!formats.link}
       />
-      <ToolbarButton icon={<Image size={ICON_SIZE} />} title="Insert image" onClick={insertImage} />
     </div>
   );
 }

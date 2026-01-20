@@ -6,6 +6,9 @@ import 'quill/dist/quill.bubble.css';
 import type { EditorProps } from './types';
 import { useQuill } from '../../context';
 import './Editor.scss';
+import '../../modules/CharCounter';
+import '../../modules/ImageDrop';
+import '../../modules/ImageResize';
 
 Quill.register('formats/list', CustomList, true);
 
@@ -17,6 +20,8 @@ const Editor = forwardRef<Quill | null, EditorProps>((props, ref) => {
     placeholder = '',
     theme = 'snow',
     className = '',
+    charCounterRef,
+    charCounterLimit,
     onTextChange,
     onSelectionChange,
     onReady,
@@ -45,12 +50,24 @@ const Editor = forwardRef<Quill | null, EditorProps>((props, ref) => {
     // Create editor container
     const editorContainer = container.appendChild(document.createElement('div'));
 
+    const hasCharCounter = Boolean(charCounterRef) || charCounterLimit !== undefined;
+
     const quill = new Quill(editorContainer, {
       theme,
       readOnly,
       placeholder,
       modules: {
         toolbar: false,
+        imageDrop: true,
+        imageResize: true,
+        ...(hasCharCounter
+          ? {
+              charCounter: {
+                container: charCounterRef?.current ?? undefined,
+                limit: charCounterLimit,
+              },
+            }
+          : {}),
       },
     });
 

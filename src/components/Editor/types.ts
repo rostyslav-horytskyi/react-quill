@@ -1,3 +1,4 @@
+import type { RefObject } from 'react';
 import type Quill from 'quill';
 import type { Delta } from 'quill/core';
 
@@ -12,6 +13,10 @@ export interface EditorProps {
   theme?: 'snow' | 'bubble';
   // Additional CSS class for the editor container
   className?: string;
+  // Optional container for the character counter module
+  charCounterRef?: RefObject<HTMLElement | null>;
+  // Optional character limit for the counter display
+  charCounterLimit?: number;
   // Callback fired when the text content changes
   onTextChange?: (delta: Delta, oldDelta: Delta, source: string) => void;
   // Callback fired when the selection changes

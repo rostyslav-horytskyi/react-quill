@@ -10,6 +10,7 @@ import {
 } from './components/buttons';
 import UnorderedListDropdown from './components/UnorderedListDropdown';
 import OrderedListDropdown from './components/OrderedListDropdown';
+import ImageButton from './components/ImageButton/ImageButton.tsx';
 
 export default function Toolbar() {
   return (
@@ -31,6 +32,7 @@ export default function Toolbar() {
       <BlockButtons />
       <ToolbarDivider />
       <InsertButtons />
+      <ImageButton />
       <ToolbarDivider />
       <ClearFormatButton />
     </div>
