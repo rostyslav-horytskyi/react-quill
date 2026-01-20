@@ -1,10 +1,6 @@
 node_modules
 dist
 coverage
-src/test
-src/**/*.test.*
-src/**/*.spec.*
-**/__tests__
 .git
 .husky
 *.log
