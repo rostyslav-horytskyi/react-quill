@@ -101,10 +101,6 @@ class ImageDrop {
 
       this.quill.insertEmbed(insertAt, 'image', base64Image, 'user');
       this.quill.setSelection(insertAt + 1, 0);
-      const resizeModule = this.quill.getModule('imageResize') as
-        | { activateAtIndex?: (index: number) => void }
-        | undefined;
-      resizeModule?.activateAtIndex?.(insertAt);
     };
 
     reader.readAsDataURL(file);

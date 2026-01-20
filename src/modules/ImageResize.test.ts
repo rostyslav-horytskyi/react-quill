@@ -53,7 +53,7 @@ describe('ImageResize module', () => {
     expect(toolbar.classList.contains('is-hidden')).toBe(true);
   });
 
-  it('auto-activates UI after image insert', async () => {
+  it('does not auto-activate UI after image insert (requires explicit click)', async () => {
     const { quill, container } = createQuill();
 
     quill.insertEmbed(0, 'image', IMAGE_DATA, 'user');
@@ -63,8 +63,9 @@ describe('ImageResize module', () => {
     const overlay = container.querySelector('.ql-image-resize-overlay') as HTMLElement;
     const toolbar = container.querySelector('.ql-image-toolbar') as HTMLElement;
 
-    expect(overlay.classList.contains('is-hidden')).toBe(false);
-    expect(toolbar.classList.contains('is-hidden')).toBe(false);
+    // UI should remain hidden - only shows on explicit image click
+    expect(overlay.classList.contains('is-hidden')).toBe(true);
+    expect(toolbar.classList.contains('is-hidden')).toBe(true);
   });
 
   it('hides UI when selection length is greater than 1', async () => {

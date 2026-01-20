@@ -53,8 +53,11 @@ describe('<ImageUploadTab />', () => {
     await user.upload(input, file);
 
     await waitFor(() => {
-      expect(screen.getByText('Selected: photo.png')).toBeInTheDocument();
+      expect(screen.getByText('photo.png')).toBeInTheDocument();
     });
+
+    // Should show Change button when file is selected
+    expect(screen.getByText('Change')).toBeInTheDocument();
 
     const insertButton = screen.getByRole('button', { name: /insert image/i });
     expect(insertButton).toBeEnabled();
@@ -63,7 +66,8 @@ describe('<ImageUploadTab />', () => {
 
     expect(onInsert).toHaveBeenCalledWith(IMAGE_DATA_URL);
     expect(onClose).toHaveBeenCalled();
-    expect(screen.queryByText(/Selected:/)).not.toBeInTheDocument();
+    // After insert, file should be cleared
+    expect(screen.queryByText('photo.png')).not.toBeInTheDocument();
   });
 
   it('handles drag and drop', async () => {
@@ -79,11 +83,12 @@ describe('<ImageUploadTab />', () => {
     fireEvent.drop(dropZone, { dataTransfer: { files: [file], clearData: vi.fn() } });
 
     await waitFor(() => {
-      expect(screen.getByText('Selected: drop.png')).toBeInTheDocument();
+      // After drop, should show filename and Change button (drop zone is replaced with preview)
+      expect(screen.getByText('drop.png')).toBeInTheDocument();
+      expect(screen.getByText('Change')).toBeInTheDocument();
     });
 
-    fireEvent.dragLeave(dropZone);
-
-    expect(dropZone.className).not.toContain('border-blue-500');
+    // Drop zone should no longer be visible after file is selected
+    expect(screen.queryByRole('button', { name: /drop image/i })).not.toBeInTheDocument();
   });
 });

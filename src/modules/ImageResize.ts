@@ -24,10 +24,7 @@ class ImageResize {
   private startHeight = 0;
   private hasImageLoadListener = false;
   private isHandlingClick = false;
-  private pendingActivationIndex: number | null = null;
-  private activationAttempts = 0;
   private activationFrame: number | null = null;
-  private pendingActivationByDom = false;
   private suppressSelectionChange = false;
   private suppressSelectionChangeTimer: number | null = null;
   private suppressOutsideClick = false;
@@ -171,164 +168,48 @@ class ImageResize {
       return;
     }
 
-    if (!range) {
+    // Don't hide UI if focus is on the caption input
+    if (document.activeElement === this.captionInput) {
+      return;
+    }
+
+    // Hide UI if no range or if any text is selected (length > 0)
+    // UI should only be shown when image is clicked, not when selected via keyboard
+    if (!range || range.length > 0) {
       this.hideUI();
       return;
     }
 
-    if (range.length !== 1) {
-      this.hideUI();
-      return;
+    // If we have an active image but cursor moved away, hide UI
+    if (this.activeImage) {
+      const [leaf] = this.quill.getLeaf(range.index);
+      const image = leaf?.domNode instanceof HTMLImageElement ? leaf.domNode : null;
+
+      if (image !== this.activeImage) {
+        this.hideUI();
+      }
     }
-
-    const [leaf] = this.quill.getLeaf(range.index);
-    const image = leaf?.domNode instanceof HTMLImageElement ? leaf.domNode : null;
-
-    if (!image) {
-      this.hideUI();
-      return;
-    }
-
-    if (this.activeImage && this.activeImage !== image) {
-      this.detachImageLoadListener();
-    }
-
-    this.activeImage = image;
-    this.activeIndex = range.index;
-    this.captionInput.value = image.getAttribute('alt') || '';
-    this.showUI();
   }
 
   private handleTextChange(
-    delta: { ops?: Array<{ retain?: number; insert?: unknown; delete?: number }> } | undefined,
+    _delta: { ops?: Array<{ retain?: number; insert?: unknown; delete?: number }> } | undefined,
     _oldDelta: unknown,
     _source: string
   ) {
-    const insertIndex = this.getImageInsertIndex(delta);
+    if (!this.activeImage) return;
 
-    if (insertIndex !== null) {
-      this.activateAtIndex(insertIndex);
+    // Check if the active image was removed from the DOM
+    if (!this.quill.root.contains(this.activeImage)) {
+      this.hideUI();
       return;
     }
 
-    if (!this.activeImage) return;
     this.positionUI();
   }
 
   private handleScroll() {
     if (!this.activeImage) return;
     this.positionUI();
-  }
-
-  private getImageInsertIndex(
-    delta: { ops?: Array<{ retain?: number; insert?: unknown; delete?: number }> } | undefined
-  ) {
-    if (!delta?.ops) return null;
-
-    let index = 0;
-
-    for (const op of delta.ops) {
-      if (typeof op.retain === 'number') {
-        index += op.retain;
-      }
-
-      if (op.insert && typeof op.insert === 'object') {
-        const insert = op.insert as { image?: unknown };
-        if (Object.prototype.hasOwnProperty.call(insert, 'image')) {
-          return index;
-        }
-      }
-
-      if (typeof op.insert === 'string') {
-        index += op.insert.length;
-      }
-    }
-
-    return null;
-  }
-
-  public activateAtIndex(index: number) {
-    this.pendingActivationIndex = index;
-    this.activationAttempts = 0;
-    this.pendingActivationByDom = true;
-    this.tryActivatePending();
-  }
-
-  private tryActivatePending() {
-    if (this.pendingActivationIndex === null) return;
-
-    if (this.activationFrame !== null) {
-      cancelAnimationFrame(this.activationFrame);
-      this.activationFrame = null;
-    }
-
-    let didActivate = this.activateAtIndexInternal(this.pendingActivationIndex);
-    if (!didActivate && this.pendingActivationByDom) {
-      didActivate = this.activateLastImageInDom();
-    }
-    if (didActivate) {
-      this.pendingActivationIndex = null;
-      this.pendingActivationByDom = false;
-      return;
-    }
-
-    this.activationAttempts += 1;
-    if (this.activationAttempts >= 6) {
-      this.pendingActivationIndex = null;
-      return;
-    }
-
-    this.activationFrame = requestAnimationFrame(() => this.tryActivatePending());
-  }
-
-  private activateLastImageInDom() {
-    const images = this.quill.root.querySelectorAll('img');
-    const lastImage = images[images.length - 1];
-    if (!lastImage || !(lastImage instanceof HTMLImageElement)) {
-      return false;
-    }
-
-    return this.activateFromImageElement(lastImage);
-  }
-
-  private activateFromImageElement(image: HTMLImageElement) {
-    const blot = Quill.find(image, true);
-    if (!blot || blot instanceof Quill) return false;
-
-    const index = this.quill.getIndex(blot);
-    if (this.activeImage && this.activeImage !== image) {
-      this.detachImageLoadListener();
-    }
-
-    this.activeImage = image;
-    this.activeIndex = index;
-    this.captionInput.value = image.getAttribute('alt') || '';
-    this.suppressSelectionChangeOnce();
-    this.suppressOutsideClickOnce();
-    this.showUI();
-    return true;
-  }
-
-  private activateAtIndexInternal(index: number) {
-    const findImageAt = (targetIndex: number) => {
-      const [leaf] = this.quill.getLeaf(targetIndex);
-      return leaf?.domNode instanceof HTMLImageElement ? leaf.domNode : null;
-    };
-
-    const candidates = [index, index - 1, index - 2].filter(value => value >= 0);
-    let image: HTMLImageElement | null = null;
-
-    for (const candidate of candidates) {
-      const found = findImageAt(candidate);
-      if (found) {
-        image = found;
-        break;
-      }
-    }
-
-    if (!image) return false;
-
-    return this.activateFromImageElement(image);
   }
 
   private handleRootMouseDown(event: MouseEvent) {
@@ -540,18 +421,6 @@ class ImageResize {
     this.suppressSelectionChangeTimer = window.setTimeout(() => {
       this.suppressSelectionChange = false;
       this.suppressSelectionChangeTimer = null;
-    }, 0);
-  }
-
-  private suppressOutsideClickOnce() {
-    if (this.suppressOutsideClickTimer !== null) {
-      window.clearTimeout(this.suppressOutsideClickTimer);
-    }
-
-    this.suppressOutsideClick = true;
-    this.suppressOutsideClickTimer = window.setTimeout(() => {
-      this.suppressOutsideClick = false;
-      this.suppressOutsideClickTimer = null;
     }, 0);
   }
 

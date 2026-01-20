@@ -100,35 +100,6 @@ function ImageUploadTab({ onInsert, onClose }: ImageUploadTabProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <label
-          htmlFor="image-upload"
-          className="text-sm font-medium text-gray-700 dark:text-gray-200"
-        >
-          Upload image
-        </label>
-        <div
-          role="button"
-          tabIndex={0}
-          onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              fileInputRef.current?.click();
-            }
-          }}
-          onClick={() => fileInputRef.current?.click()}
-          onDragEnter={handleDragEnter}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          className={`flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-6 text-center text-sm transition-colors cursor-pointer ${
-            isDragActive
-              ? 'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-300'
-              : 'border-gray-200 text-gray-500 hover:text-gray-700 hover:border-gray-500 dark:border-gray-700 dark:text-gray-400'
-          }`}
-        >
-          <CloudUpload size={22} />
-          <span className="font-medium">Drop Image (or click)</span>
-        </div>
         <input
           id="image-upload"
           ref={fileInputRef}
@@ -137,7 +108,65 @@ function ImageUploadTab({ onInsert, onClose }: ImageUploadTabProps) {
           onChange={handleFileChange}
           className="sr-only"
         />
-        {fileName && <p className="text-xs text-gray-500">Selected: {fileName}</p>}
+
+        {previewUrl ? (
+          // Show preview when file is selected
+          <div className="space-y-2">
+            <div className="relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+              <img
+                src={previewUrl}
+                alt={fileName}
+                className="w-full h-32 object-contain bg-gray-50 dark:bg-gray-800"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[180px]">
+                {fileName}
+              </p>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+              >
+                Change
+              </button>
+            </div>
+          </div>
+        ) : (
+          // Show drop zone when no file selected
+          <>
+            <label
+              htmlFor="image-upload"
+              className="text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
+              Upload image
+            </label>
+            <div
+              role="button"
+              tabIndex={0}
+              onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  fileInputRef.current?.click();
+                }
+              }}
+              onClick={() => fileInputRef.current?.click()}
+              onDragEnter={handleDragEnter}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-6 text-center text-sm transition-colors cursor-pointer ${
+                isDragActive
+                  ? 'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-300'
+                  : 'border-gray-200 text-gray-500 hover:text-gray-700 hover:border-gray-500 dark:border-gray-700 dark:text-gray-400'
+              }`}
+            >
+              <CloudUpload size={22} />
+              <span className="font-medium">Drop Image (or click)</span>
+            </div>
+          </>
+        )}
+
         {error && (
           <p className="text-xs text-red-500" role="alert">
             {error}
@@ -146,13 +175,15 @@ function ImageUploadTab({ onInsert, onClose }: ImageUploadTabProps) {
       </div>
 
       <div className="flex justify-end gap-2">
-        <button
-          type="button"
-          onClick={handleClear}
-          className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-        >
-          Clear
-        </button>
+        {previewUrl && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+          >
+            Clear
+          </button>
+        )}
         <button
           type="button"
           onClick={handleInsert}

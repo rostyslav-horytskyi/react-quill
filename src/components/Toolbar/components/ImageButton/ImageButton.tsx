@@ -18,10 +18,6 @@ function ImageButton() {
     quill.insertEmbed(range.index, 'image', url, 'user');
     quill.setSelection(range.index + 1, 0);
     refreshFormats();
-    const resizeModule = quill.getModule('imageResize') as
-      | { activateAtIndex?: (index: number) => void }
-      | undefined;
-    resizeModule?.activateAtIndex?.(range.index);
   };
 
   return (
