@@ -94,3 +94,23 @@
 .ql-font-impact {
   font-family: Impact, sans-serif;
 }
+
+// Hide Quill's built-in language selector (we use our custom dropdown)
+.ql-syntax select,
+.ql-code-block-container select {
+  display: none !important;
+}
+
+// Code block syntax highlighting styles
+.ql-editor pre.ql-syntax {
+  background-color: #f6f8fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 0.5rem;
+  color: #24292e;
+  font-family: 'Fira Code', 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  padding: 1rem;
+  position: relative;
+}

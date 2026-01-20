@@ -2,8 +2,10 @@ import { forwardRef, useRef, useEffect, useLayoutEffect } from 'react';
 import Quill from 'quill';
 import CustomList from '../../quill/formats/list.ts';
 import '../../quill/formats/font';
+import { syntaxOptions } from '../../quill/modules/syntax';
 import 'quill/dist/quill.snow.css';
 import 'quill/dist/quill.bubble.css';
+import 'highlight.js/styles/github.css';
 import type { EditorProps } from './types';
 import { useQuill } from '../../context';
 import './Editor.scss';
@@ -61,6 +63,7 @@ const Editor = forwardRef<Quill | null, EditorProps>((props, ref) => {
         toolbar: false,
         imageDrop: true,
         imageResize: true,
+        syntax: syntaxOptions,
         ...(hasCharCounter
           ? {
               charCounter: {

@@ -28,7 +28,7 @@ export interface EditorFormats {
     | 'square';
   align?: string | false;
   blockquote?: boolean;
-  'code-block'?: boolean;
+  'code-block'?: string | boolean;
   link?: string;
   header?: number | false;
   color?: string;

@@ -21,6 +21,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "highlight.js": "^11.11.1",
     "lucide-react": "^0.562.0",
     "quill": "^2.0.3",
     "react": "^19.2.0",

@@ -78,14 +78,16 @@ body {
   padding-left: 1rem;
 }
 
-.ql-editor pre.ql-syntax {
-  background-color: #1e293b;
-  border-radius: 0.5rem;
-  color: #e2e8f0;
-  font-family: 'Fira Code', Consolas, monospace;
-  font-size: 0.875rem;
-  overflow-x: auto;
-  padding: 1rem;
+.ql-editor pre.ql-syntax,
+.ql-snow .ql-editor .ql-code-block-container {
+  background-color: #f6f8fa !important;
+  border: 1px solid #e1e4e8 !important;
+  border-radius: 0.5rem !important;
+  color: #24292e !important;
+  font-family: 'Fira Code', Consolas, monospace !important;
+  font-size: 0.875rem !important;
+  overflow-x: auto !important;
+  padding: 1rem !important;
 }
 
 .ql-editor ul,

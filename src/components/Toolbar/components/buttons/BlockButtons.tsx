@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Quote, Code, Minus } from 'lucide-react';
+import { Quote, Minus } from 'lucide-react';
 import { useQuill } from '../../../../context';
 import ToolbarButton from '../ToolbarButton/ToolbarButton';
 
@@ -36,12 +36,6 @@ export default function BlockButtons() {
         title="Quote"
         onClick={() => formatBlock('blockquote')}
         isActive={!!formats.blockquote}
-      />
-      <ToolbarButton
-        icon={<Code size={ICON_SIZE} />}
-        title="Code block"
-        onClick={() => formatBlock('code-block')}
-        isActive={!!formats['code-block']}
       />
       <ToolbarButton icon={<Minus size={ICON_SIZE} />} title="Divider" onClick={insertDivider} />
     </div>
