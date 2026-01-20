@@ -1,39 +1,47 @@
+import { useCallback } from 'react';
 import { Palette, Highlighter } from 'lucide-react';
 import { useQuill } from '../../../../context';
-import ToolbarButton from '../ToolbarButton/ToolbarButton';
+import ColorPicker, { TEXT_COLORS, HIGHLIGHT_COLORS } from '../ColorPicker';
 
 const ICON_SIZE = 18;
 
 export default function ColorButtons() {
-  const { quill, formats } = useQuill();
+  const { quill, formats, refreshFormats } = useQuill();
 
-  const setTextColor = () => {
-    const color = prompt('Enter color (hex or name):', '#3b82f6');
-    if (color && quill) {
+  const handleTextColor = useCallback(
+    (color: string | false) => {
+      if (!quill) return;
       quill.format('color', color);
-    }
-  };
+      refreshFormats();
+    },
+    [quill, refreshFormats]
+  );
 
-  const setHighlight = () => {
-    const color = prompt('Enter highlight color:', '#fef08a');
-    if (color && quill) {
+  const handleHighlight = useCallback(
+    (color: string | false) => {
+      if (!quill) return;
       quill.format('background', color);
-    }
-  };
+      refreshFormats();
+    },
+    [quill, refreshFormats]
+  );
 
   return (
     <div className="flex items-center gap-0.5">
-      <ToolbarButton
+      <ColorPicker
         icon={<Palette size={ICON_SIZE} />}
         title="Text color"
-        onClick={setTextColor}
-        isActive={!!formats.color}
+        currentColor={formats.color}
+        onColorSelect={handleTextColor}
+        colors={TEXT_COLORS}
       />
-      <ToolbarButton
+      <ColorPicker
         icon={<Highlighter size={ICON_SIZE} />}
         title="Highlight"
-        onClick={setHighlight}
-        isActive={!!formats.background}
+        currentColor={formats.background}
+        onColorSelect={handleHighlight}
+        colors={HIGHLIGHT_COLORS}
+        showColorBar={false}
       />
     </div>
   );
