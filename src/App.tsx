@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import Editor from './components/Editor/Editor';
 import Toolbar from './components/Toolbar';
 import { QuillProvider, useQuill } from './context';
@@ -8,15 +8,7 @@ function AppContent() {
   const { quill } = useQuill();
   const [isDark, setIsDark] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
-  const [wordCount, setWordCount] = useState(0);
-
-  const handleTextChange = useCallback(() => {
-    if (quill) {
-      const text = quill.getText();
-      const words = text.trim().split(/\s+/).filter(Boolean).length;
-      setWordCount(words);
-    }
-  }, [quill]);
+  const charCounterRef = useRef<HTMLElement>(null);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -63,11 +55,12 @@ function AppContent() {
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Word count */}
+              {/* Character count */}
               <span
                 className={`text-sm px-3 py-1.5 rounded-lg ${isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'}`}
+                ref={charCounterRef}
               >
-                {wordCount} words
+                0 chars
               </span>
 
               {/* Preview toggle */}
@@ -113,9 +106,9 @@ function AppContent() {
           <div className={`transition-colors ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
             <Editor
               placeholder="Start writing something amazing..."
-              onTextChange={handleTextChange}
               readOnly={isPreview}
               className={isPreview ? 'opacity-90' : ''}
+              charCounterRef={charCounterRef}
             />
           </div>
 
