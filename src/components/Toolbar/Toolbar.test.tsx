@@ -88,6 +88,12 @@ describe('<Toolbar />', () => {
       expect(screen.getByTitle('Insert link')).toBeInTheDocument();
     });
 
+    it('should contain mention button', () => {
+      render(<Toolbar />);
+
+      expect(screen.getByTitle('Insert mention')).toBeInTheDocument();
+    });
+
     it('should contain image button', () => {
       render(<Toolbar />);
 

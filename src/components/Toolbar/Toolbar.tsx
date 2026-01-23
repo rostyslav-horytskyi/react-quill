@@ -8,6 +8,7 @@ import OrderedListDropdown from './components/OrderedListDropdown';
 import ImageButton from './components/ImageButton/ImageButton.tsx';
 import LinkButton from './components/LinkButton';
 import CodeBlockDropdown from './components/CodeBlockDropdown';
+import MentionButton from './components/MentionButton';
 
 export default function Toolbar() {
   return (
@@ -31,6 +32,7 @@ export default function Toolbar() {
       <CodeBlockDropdown />
       <ToolbarDivider />
       <LinkButton />
+      <MentionButton />
       <ImageButton />
       <ToolbarDivider />
       <ClearFormatButton />

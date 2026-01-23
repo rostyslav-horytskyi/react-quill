@@ -12,6 +12,7 @@ import './Editor.scss';
 import '../../modules/CharCounter';
 import '../../modules/ImageDrop';
 import '../../modules/ImageResize';
+import '../../modules/Mention';
 
 Quill.register('formats/list', CustomList, true);
 
@@ -25,6 +26,7 @@ const Editor = forwardRef<Quill | null, EditorProps>((props, ref) => {
     className = '',
     charCounterRef,
     charCounterLimit,
+    mentionSource,
     onTextChange,
     onSelectionChange,
     onReady,
@@ -54,6 +56,7 @@ const Editor = forwardRef<Quill | null, EditorProps>((props, ref) => {
     const editorContainer = container.appendChild(document.createElement('div'));
 
     const hasCharCounter = Boolean(charCounterRef) || charCounterLimit !== undefined;
+    const mentionModule = mentionSource ? { source: mentionSource } : {};
 
     const quill = new Quill(editorContainer, {
       theme,
@@ -64,6 +67,7 @@ const Editor = forwardRef<Quill | null, EditorProps>((props, ref) => {
         imageDrop: true,
         imageResize: true,
         syntax: syntaxOptions,
+        mention: mentionModule,
         ...(hasCharCounter
           ? {
               charCounter: {

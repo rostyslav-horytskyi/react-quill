@@ -1,6 +1,7 @@
 import type { RefObject } from 'react';
 import type Quill from 'quill';
 import type { Delta } from 'quill/core';
+import type { MentionSource } from '../../modules/Mention/types';
 
 export interface EditorProps {
   // Initial content of the editor as a Quill Delta
@@ -17,6 +18,8 @@ export interface EditorProps {
   charCounterRef?: RefObject<HTMLElement | null>;
   // Optional character limit for the counter display
   charCounterLimit?: number;
+  // Optional custom source for mention suggestions
+  mentionSource?: MentionSource;
   // Callback fired when the text content changes
   onTextChange?: (delta: Delta, oldDelta: Delta, source: string) => void;
   // Callback fired when the selection changes
