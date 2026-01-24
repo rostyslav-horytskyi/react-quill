@@ -10,7 +10,8 @@ interface QuillMockOptions {
 }
 
 export function createQuillMock(options: QuillMockOptions = {}) {
-  let currentSelection: Selection = options.selection ?? { index: 0, length: 0 };
+  let currentSelection: Selection =
+    options.selection !== undefined ? options.selection : { index: 0, length: 0 };
   let currentFormats: FormatState = { ...(options.formats ?? {}) };
 
   const quill = {
@@ -27,9 +28,11 @@ export function createQuillMock(options: QuillMockOptions = {}) {
     insertText: vi.fn(),
     insertEmbed: vi.fn(),
     removeFormat: vi.fn(),
+    getLength: vi.fn(() => 0),
     getLine: vi.fn(() => [{ length: () => 1 }, 0]),
     getIndex: vi.fn(() => 0),
     formatLine: vi.fn(),
+    focus: vi.fn(),
     on: vi.fn(),
     off: vi.fn(),
     getText: vi.fn(() => 'Selected text'),

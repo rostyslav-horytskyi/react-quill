@@ -106,4 +106,71 @@ describe('<ImageUploadTab />', () => {
     // Drop zone should no longer be visible after file is selected
     expect(screen.queryByRole('button', { name: /drop image/i })).not.toBeInTheDocument();
   });
+
+  it('should clear the selected image', async () => {
+    const { user } = render(<ImageUploadTab onInsert={vi.fn()} />);
+    const input = screen.getByLabelText('Upload image');
+    const file = new File(['img'], 'clear.png', { type: 'image/png' });
+
+    await user.upload(input, file);
+
+    await waitFor(() => {
+      expect(screen.getByText('clear.png')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Clear' }));
+
+    expect(screen.queryByText('clear.png')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /drop image/i })).toBeInTheDocument();
+  });
+
+  it('should show an error when file reading fails', async () => {
+    class ErrorFileReader extends FileReaderMock {
+      readAsDataURL() {
+        this.onerror?.(new Event('error') as ProgressEvent<FileReader>);
+      }
+    }
+
+    globalThis.FileReader = ErrorFileReader as unknown as typeof FileReader;
+
+    render(<ImageUploadTab onInsert={vi.fn()} />);
+
+    const input = screen.getByLabelText('Upload image');
+    const file = new File(['img'], 'broken.png', { type: 'image/png' });
+
+    fireEvent.change(input, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        'Failed to read the file. Please try again.'
+      );
+    });
+  });
+
+  it('should activate the file picker on Enter key', () => {
+    const clickSpy = vi.spyOn(HTMLInputElement.prototype, 'click');
+    render(<ImageUploadTab onInsert={vi.fn()} />);
+
+    const dropZone = screen.getByRole('button', { name: /drop image/i });
+    fireEvent.keyDown(dropZone, { key: 'Enter' });
+
+    expect(clickSpy).toHaveBeenCalled();
+    clickSpy.mockRestore();
+  });
+
+  it('should keep drag highlight until the last drag leave', () => {
+    render(<ImageUploadTab onInsert={vi.fn()} />);
+
+    const dropZone = screen.getByRole('button', { name: /drop image/i });
+
+    fireEvent.dragEnter(dropZone);
+    fireEvent.dragEnter(dropZone);
+    fireEvent.dragLeave(dropZone);
+
+    expect(dropZone.className).toContain('border-blue-500');
+
+    fireEvent.dragLeave(dropZone);
+
+    expect(dropZone.className).not.toContain('border-blue-500');
+  });
 });
