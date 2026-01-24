@@ -51,7 +51,8 @@ describe('MentionModule', () => {
   });
 
   afterEach(() => {
-    quill.getModule('mention')?.destroy();
+    const mentionModule = quill.getModule('mention') as { destroy: () => void } | undefined;
+    mentionModule?.destroy();
     container.remove();
     rafSpy?.mockRestore();
     cafSpy?.mockRestore();
@@ -212,7 +213,7 @@ describe('MentionModule', () => {
     await vi.runAllTimersAsync();
     await Promise.resolve();
 
-    const mentionModule = quill.getModule('mention');
+    const mentionModule = quill.getModule('mention') as { destroy: () => void } | undefined;
     const destroySpy = vi.spyOn(mentionModule!, 'destroy');
 
     mentionModule?.destroy();
@@ -252,7 +253,7 @@ describe('MentionModule', () => {
   it('should cancel a scheduled update on destroy', () => {
     quill.insertText(0, '@', Quill.sources.USER);
 
-    const mentionModule = quill.getModule('mention');
+    const mentionModule = quill.getModule('mention') as { destroy: () => void } | undefined;
     mentionModule?.destroy();
 
     expect(cafSpy).toHaveBeenCalled();

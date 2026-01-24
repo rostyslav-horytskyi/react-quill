@@ -47,7 +47,11 @@ const createQuill = () => {
 
 const docWithCaret = document as Document & {
   caretRangeFromPoint?: (x: number, y: number) => Range | null;
-  caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null;
+  caretPositionFromPoint?: (
+    x: number,
+    y: number,
+    options?: CaretPositionFromPointOptions
+  ) => CaretPosition | null;
 };
 
 const originalFileReader = globalThis.FileReader;
@@ -77,8 +81,9 @@ describe('ImageDrop module', () => {
         docWithCaret as {
           caretPositionFromPoint?: (
             x: number,
-            y: number
-          ) => { offsetNode: Node; offset: number } | null;
+            y: number,
+            options?: CaretPositionFromPointOptions
+          ) => CaretPosition | null;
         }
       ).caretPositionFromPoint;
     }
@@ -182,11 +187,12 @@ describe('ImageDrop module', () => {
     quill.setText('Hello');
 
     const textNode = quill.root.querySelector('p')?.firstChild as Text;
-    docWithCaret.caretRangeFromPoint = undefined;
+    delete (docWithCaret as { caretRangeFromPoint?: unknown }).caretRangeFromPoint;
     docWithCaret.caretPositionFromPoint = vi.fn(() => ({
       offsetNode: textNode,
       offset: 1,
-    }));
+      getClientRect: () => new DOMRect(),
+    })) as unknown as NonNullable<typeof docWithCaret.caretPositionFromPoint>;
 
     const insertSpy = vi.spyOn(quill, 'insertEmbed');
     const selectionSpy = vi.spyOn(quill, 'setSelection');
