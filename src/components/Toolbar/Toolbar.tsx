@@ -9,6 +9,8 @@ import ImageButton from './components/ImageButton/ImageButton.tsx';
 import LinkButton from './components/LinkButton';
 import CodeBlockDropdown from './components/CodeBlockDropdown';
 import MentionButton from './components/MentionButton';
+import TableButton from './components/TableButton/TableButton.tsx';
+import TableActions from './components/TableActions/TableActions';
 
 export default function Toolbar() {
   return (
@@ -34,6 +36,8 @@ export default function Toolbar() {
       <LinkButton />
       <MentionButton />
       <ImageButton />
+      <TableButton />
+      <TableActions />
       <ToolbarDivider />
       <ClearFormatButton />
     </div>

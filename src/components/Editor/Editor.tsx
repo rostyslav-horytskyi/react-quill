@@ -6,6 +6,7 @@ import { syntaxOptions } from '../../quill/modules/syntax';
 import 'quill/dist/quill.snow.css';
 import 'quill/dist/quill.bubble.css';
 import 'highlight.js/styles/github.css';
+import 'quill-table-up/index.css';
 import type { EditorProps } from './types';
 import { useQuill } from '../../context';
 import './Editor.scss';
@@ -13,6 +14,7 @@ import '../../modules/CharCounter';
 import '../../modules/ImageDrop';
 import '../../modules/ImageResize';
 import '../../modules/Mention';
+import { TableSelection } from '../../modules/Table';
 
 Quill.register('formats/list', CustomList, true);
 
@@ -68,6 +70,10 @@ const Editor = forwardRef<Quill | null, EditorProps>((props, ref) => {
         imageResize: true,
         syntax: syntaxOptions,
         mention: mentionModule,
+        'table-up': {
+          full: true,
+          modules: [{ module: TableSelection, options: {} }],
+        },
         ...(hasCharCounter
           ? {
               charCounter: {

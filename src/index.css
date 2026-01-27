@@ -195,6 +195,20 @@ body {
   padding: 6px 10px;
 }
 
+.ql-table-toolbar {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 10px 24px rgb(15, 23, 42, 0.18);
+  display: inline-flex;
+  gap: 4px;
+  padding: 6px;
+  position: absolute;
+  transform: translateY(-100%);
+  z-index: 50;
+}
+
 .ql-editor.ql-image-selected {
   caret-color: transparent;
 }

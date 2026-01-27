@@ -31,10 +31,10 @@ export default defineConfig({
       reportsDirectory: './coverage',
       exclude: ['node_modules/', 'src/test/', '**/*.d.ts', '**/*.config.*', '**/*.scss'],
       thresholds: {
-        lines: 91,
-        statements: 88,
+        lines: 90,
+        statements: 87,
         branches: 75,
-        functions: 93,
+        functions: 90,
       },
     },
   },

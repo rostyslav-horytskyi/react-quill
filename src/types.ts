@@ -33,4 +33,8 @@ export interface EditorFormats {
   header?: number | false;
   color?: string;
   background?: string;
+  table?: string;
+  row?: string;
+  col?: string;
+  tableHeader?: 'row' | 'col';
 }
